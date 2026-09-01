@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/templates/build-entry-template/","tags":["gardenEntry"],"dg-note-properties":{"dimension":"{{MACRO:getDimension}}","region":"{{MACRO:getRegion}}","x_coordinate":"{{VALUE:X Coordinate}}","y_coordinate":"{{VALUE:Y Coordinate}}","z_coordinate":"{{VALUE:Z Coordinate}}","start_date":"{{MACRO:getStartDate}}","finish_date":"{{MACRO:getFinishDate}}","type":"{{MACRO:getType}}","builders":"{{MACRO:getBuilders}}"}}
+{"dg-publish":true,"permalink":"/templates/build-entry-template/","dg-note-properties":{"dimension":"{{MACRO:getDimension}}","region":"{{MACRO:getRegion}}","x_coordinate":"{{VALUE:X Coordinate}}","y_coordinate":"{{VALUE:Y Coordinate}}","z_coordinate":"{{VALUE:Z Coordinate}}","start_date":"{{MACRO:getStartDate}}","finish_date":"{{MACRO:getFinishDate}}","type":"{{MACRO:getType}}","builders":"{{MACRO:getBuilders}}"}}
 ---
 
 ---
