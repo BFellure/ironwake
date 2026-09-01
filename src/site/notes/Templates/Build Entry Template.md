@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/templates/build-entry-template/","dg-note-properties":{"dimension":"{{MACRO:getDimension}}","region":"{{MACRO:getRegion}}","x_coordinate":"{{VALUE:X Coordinate}}","y_coordinate":"{{VALUE:Y Coordinate}}","z_coordinate":"{{VALUE:Z Coordinate}}","start_date":"{{MACRO:getStartDate}}","finish_date":"{{MACRO:getFinishDate}}","type":"{{MACRO:getType}}","builders":"{{MACRO:getBuilders}}"}}
+{"dg-publish":true,"permalink":"/templates/build-entry-template/","updated":"2026-09-01T00:02:38.303-04:00","dg-note-properties":{"dimension":"{{MACRO:getDimension}}","region":"{{MACRO:getRegion}}","x_coordinate":"{{VALUE:X Coordinate}}","y_coordinate":"{{VALUE:Y Coordinate}}","z_coordinate":"{{VALUE:Z Coordinate}}","start_date":"{{MACRO:getStartDate}}","finish_date":"{{MACRO:getFinishDate}}","type":"{{MACRO:getType}}","builders":"{{MACRO:getBuilders}}"}}
 ---
 
 ---

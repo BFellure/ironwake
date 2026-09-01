@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/builds/florwyn-hall/","dg-note-properties":{"dimension":"Overworld","region":"Provenor Capitol","x_coordinate":"35","y_coordinate":"72","z_coordinate":"705","start_date":"Unknown","finish_date":"Unknown","type":"Base","builders":"[[Bodin Fellure]]"}}
+{"dg-publish":true,"permalink":"/builds/florwyn-hall/","updated":"2026-09-01T00:29:55.340-04:00","dg-note-properties":{"dimension":"Overworld","region":"Provenor Capitol","x_coordinate":"35","y_coordinate":"72","z_coordinate":"705","start_date":"Unknown","finish_date":"Unknown","type":"Base","builders":"[[Bodin Fellure]]"}}
 ---
 
 ---
