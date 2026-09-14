@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/barn-and-silo/","updated":"2026-09-14T01:24:47.392-04:00","dg-note-properties":{"dimension":"Overworld","region":"[[Fellanclark Agrishare]]","x_coordinate":179,"y_coordinate":63,"z_coordinate":771,"start_date":"December 2, 2025","finish_date":"In Progress","building_type":"Facility","builders":["[[Bodin Fellure]]"],"images":["![[Pasted Images/Pasted Image 1789363141040-0sthh.png|400]]"],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/barn-and-silo/","updated":"2026-09-14T02:01:50.724-04:00","dg-note-properties":{"dimension":"Overworld","region":"[[Fellanclark Agrishare]]","x_coordinate":179,"y_coordinate":63,"z_coordinate":771,"start_date":"December 2, 2025","finish_date":"In Progress","building_type":"Facility","builders":["[[Bodin Fellure]]"],"images":["![[Pasted Images/Pasted Image 1789363141040-0sthh.png]]"],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
 ---
 
 
@@ -13,7 +13,7 @@
 ---
 
 > [!tip]+ Image
-> <p><span><span width="400" alt="Pasted Images/Pasted Image 1789363141040-0sthh.png" src="Pasted Images/Pasted Image 1789363141040-0sthh.png" class="internal-embed media-embed image-embed is-loaded"><img alt="Pasted Images/Pasted Image 1789363141040-0sthh.png" width="400" src="app://bbfe967ea9980ec14ad46f717ca1aff523f3/C:/Users/Bodin%20Fellure/OneDrive/Obsidian/Dawngrove/Pasted%20Images/Pasted%20Image%201789363141040-0sthh.png?1789363141042"></span></span></p>
+> <p><span><span alt="Pasted Image 1789363141040-0sthh.png" src="Pasted Images/Pasted Image 1789363141040-0sthh.png" class="internal-embed media-embed image-embed is-loaded"><img alt="Pasted Image 1789363141040-0sthh.png" src="app://bbfe967ea9980ec14ad46f717ca1aff523f3/C:/Users/Bodin%20Fellure/OneDrive/Obsidian/Dawngrove/Pasted%20Images/Pasted%20Image%201789363141040-0sthh.png?1789363141042"></span></span></p>
 
 
 ---
@@ -76,4 +76,4 @@
 > [!todo]- Logs
 > <p><span><em>No logs recorded for this building yet.</em></span></p>
 
-> Last Updated: 09-14-2026 01:24 AM
+> Last Updated: 09-14-2026 02:01 AM
