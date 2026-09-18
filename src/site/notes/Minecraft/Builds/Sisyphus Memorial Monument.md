@@ -10,7 +10,7 @@
 ---
 
 > [!tip]+ Image
-> <p><span><span width="400" alt="Pasted Images/Pasted Image 1789362314597-rpyqc.png" src="Pasted Images/Pasted Image 1789362314597-rpyqc.png" class="internal-embed media-embed image-embed is-loaded"><img alt="Pasted Images/Pasted Image 1789362314597-rpyqc.png" width="400" src="app://bbfe967ea9980ec14ad46f717ca1aff523f3/C:/Users/Bodin%20Fellure/OneDrive/Obsidian/Dawngrove/Pasted%20Images/Pasted%20Image%201789362314597-rpyqc.png?1789362314600"></span></span></p>
+> <p><span><span width="400" alt="Pasted Images/Pasted Image 1789362314597-rpyqc.png" src="Pasted Images/Pasted Image 1789362314597-rpyqc.png" class="internal-embed media-embed image-embed is-loaded"><img alt="Pasted Images/Pasted Image 1789362314597-rpyqc.png" width="400" src="app://777d2fa8f1ca6bdcca972df8441d1cc7f17c/C:/Users/Bodin%20Fellure/OneDrive/Dawngrove/Pasted%20Images/Pasted%20Image%201789362314597-rpyqc.png?1789362314600"></span></span></p>
 
 
 ---
