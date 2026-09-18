@@ -1,5 +1,9 @@
 ---
-{"dg-publish":true,"permalink":"/home-page-1/","title":"Home Page","tags":["gardenEntry"],"updated":"2026-09-18T18:08:31.532-04:00","dg-note-properties":{"title":"Home Page"}}
+{"dg-publish":true,"permalink":"/home-page-1/","title":"Home Page","tags":["gardenEntry"],"updated":"2026-09-18T18:11:33.217-04:00","dg-note-properties":{"title":"Home Page"}}
 ---
 
-<div><table class="dataview table-view-table"><thead class="table-view-thead"><tr class="table-view-tr-header"><th class="table-view-th"><span>Build</span><span class="dataview small-text">1</span></th><th class="table-view-th"><span>Region</span></th><th class="table-view-th"><span>Type</span></th><th class="table-view-th"><span>Status</span></th><th class="table-view-th"><span>Preview</span></th></tr></thead><tbody class="table-view-tbody"><tr><td><span><a data-tooltip-position="top" aria-label="Minecraft/Builds/Test2.md" data-href="Minecraft/Builds/Test2.md" href="Minecraft/Builds/Test2.md" class="internal-link" target="_blank" rel="noopener nofollow">Test2</a></span></td><td><span><a data-tooltip-position="top" aria-label="Test" data-href="Test" href="Test" class="internal-link" target="_blank" rel="noopener nofollow">Test</a></span></td><td><span>Test</span></td><td><span>In Progress</span></td><td><span><div style="display: flex; align-items: center;"><span></span><img src="app://b87969474439e44154fa60d907593c228252/C:/Users/Bodin%20Fellure/OneDrive/Dawngrove/Pasted%20Images/Pasted%20Image%201789767628276-bvkx9.png?1789767628278" style="width: 65px; height: 65px; object-fit: cover; border-radius: 6px; border: 1px solid var(--background-modifier-border);"></div></span></td></tr></tbody></table></div>
+| File                                 | Region         | Type | Status      | Preview                                                                                       |
+| ------------------------------------ | -------------- | ---- | ----------- | --------------------------------------------------------------------------------------------- |
+| [[Minecraft/Builds/Test2\|Test2]] | [[Test\|Test]] | Test | In Progress | ![Pasted Images/Pasted Image 1789767628276-bvkx9.png\|Pasted Image 1789767628276-bvkx9.png](/img/user/Pasted%20Images/Pasted%20Image%201789767628276-bvkx9.png) |
+
+{ .block-language-dataview}
