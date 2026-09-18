@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test2/","updated":"2026-09-18T17:55:12.246-04:00","dg-note-properties":{"dimension":"Overworld","region":"[[Test]]","x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Unknown","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":["Pasted Images/Pasted Image 1789767628276-bvkx9.png"],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test2/","updated":"2026-09-18T18:15:02.605-04:00","dg-note-properties":{"dimension":"Overworld","region":"[[Test]]","x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Unknown","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":["Pasted Images/Pasted Image 1789769696900-e0sqe.png","Pasted Images/Pasted Image 1789769701585-2urhe.png"],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
 ---
 
    ***
@@ -11,7 +11,8 @@
 ---
 
 > [!tip]+ Image
-> > ![Pasted Image 1789767628276-bvkx9.png\|400](/img/user/Pasted%20Images/Pasted%20Image%201789767628276-bvkx9.png)
+> ![Pasted Image 1789769696900-e0sqe.png\|400](/img/user/Pasted%20Images/Pasted%20Image%201789769696900-e0sqe.png)
+> ![Pasted Image 1789769701585-2urhe.png\|400](/img/user/Pasted%20Images/Pasted%20Image%201789769701585-2urhe.png)
 
 ---
 
@@ -73,4 +74,4 @@
 > [!todo]- Logs
 > <p><span><em>No logs recorded for this building yet.</em></span></p>
 
-> Last Updated: 09-18-2026 05:55 PM
+> Last Updated: 09-18-2026 06:15 PM
