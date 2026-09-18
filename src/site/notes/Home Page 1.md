@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/home-page-1/","title":"Home Page","tags":["gardenEntry"],"updated":"2026-09-18T18:16:01.909-04:00","dg-note-properties":{"title":"Home Page"}}
+{"dg-publish":true,"permalink":"/home-page-1/","title":"Home Page","tags":["gardenEntry"],"updated":"2026-09-18T18:23:47.365-04:00","dg-note-properties":{"title":"Home Page"}}
 ---
 
 | File                                 | Region         | Type | Status      | Preview                                                                                                                                             |
