@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test4/","updated":"2026-09-18T19:59:59.338-04:00","dg-note-properties":{"dimension":"Overworld","region":"[[Test]]","x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Unknown","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":["Pasted Images/Pasted Image 1789771942856-gd3cq.png"],"structures":["1234.mcstructure","LoveLanky.mcstructure"],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test4/","updated":"2026-09-18T20:02:59.428-04:00","dg-note-properties":{"dimension":"Overworld","region":"[[Test]]","x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Unknown","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":["Pasted Images/Pasted Image 1789771942856-gd3cq.png"],"structures":["trree.mcstructure"],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
 ---
 
 ***
@@ -74,7 +74,7 @@
 > <p><span><em>No logs recorded for this building yet.</em></span></p>
 
 > [!example]- Linked Structure Files
-> <a href="https://github.com/BFellure/ironwake/releases/download/structures/LoveLanky.mcstructure" download>📥 LoveLanky.mcstructure</a>
+> <a href="https://github.com/BFellure/ironwake/releases/download/structures/trree.mcstructure" download>📥 trree.mcstructure</a>
 
 
-> Last Updated: 09-18-2026 07:59 PM
+> Last Updated: 09-18-2026 08:02 PM
