@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/sdfgsdfgsdfgsdfg/","updated":"2026-09-23T06:10:37.108-04:00","dg-note-properties":{"dimension":"Overworld","region":[[666]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Unknown","finish_date":"Unknown","building_type":123,"builders":[[123]],"images":[],"structures":[],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/sdfgsdfgsdfgsdfg/","updated":"2026-09-23T06:18:18.553-04:00","dg-note-properties":{"dimension":"Overworld","region":[[666]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Unknown","finish_date":"Unknown","building_type":123,"builders":[[123]],"images":[],"structures":[],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
 ---
 
 ***
@@ -77,7 +77,9 @@
 > _No .mcstructure files currently imported._
 
 
-> Last Updated: 09-23-2026 06:10 AM
+> Last Updated: 09-23-2026 06:18 AM
 
+<div class="obsidian-only-toolbox">
 
 <div style="background-color: rgba(255, 165, 0, 0.08); border: 1px solid orange; border-radius: 8px; padding: 12px; margin-bottom: 12px;"><span></span><div style="font-weight: 600; margin-bottom: 10px; color: var(--text-normal); display: flex; align-items: center; gap: 6px;">🧰 Editing Toolbox</div><div style="display: flex; flex-direction: column; gap: 6px;"><button style="background-color: var(--interactive-normal); color: var(--text-normal); border: 1px solid var(--background-modifier-border); border-radius: 6px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; text-align: center; width: 100%;">🧱 Import .mcstructure File(s)</button><button style="background-color: var(--interactive-normal); color: var(--text-normal); border: 1px solid var(--background-modifier-border); border-radius: 6px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; text-align: center; width: 100%;">👷 Update Builder(s)</button><button style="background-color: var(--interactive-normal); color: var(--text-normal); border: 1px solid var(--background-modifier-border); border-radius: 6px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; text-align: center; width: 100%;">📅 Update Building Dates</button><button style="background-color: var(--interactive-normal); color: var(--text-normal); border: 1px solid var(--background-modifier-border); border-radius: 6px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; text-align: center; width: 100%;">🏷️ Update Building Types</button><button style="background-color: var(--interactive-normal); color: var(--text-normal); border: 1px solid var(--background-modifier-border); border-radius: 6px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; text-align: center; width: 100%;">📍 Update Coordinates</button><button style="background-color: var(--interactive-normal); color: var(--text-normal); border: 1px solid var(--background-modifier-border); border-radius: 6px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; text-align: center; width: 100%;">📷 Update Images</button><button style="background-color: var(--interactive-normal); color: var(--text-normal); border: 1px solid var(--background-modifier-border); border-radius: 6px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; text-align: center; width: 100%;">🗺️ Update Location</button></div></div>
+</div>
