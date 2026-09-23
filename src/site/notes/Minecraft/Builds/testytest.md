@@ -1,8 +1,8 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/testytest/","updated":"2026-09-23T06:50:52.602-04:00","dg-note-properties":{"dimension":"Overworld","region":[[5]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":123,"builders":[[123]],"images":[],"structures":[],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/testytest/","updated":"2026-09-23T06:56:07.563-04:00","dg-note-properties":{"dimension":"Overworld","region":[[5]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":123,"builders":[[123]],"images":[],"structures":[],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
 ---
 
-***
+*** 
 
 <div style="background-color: var(--background-secondary); border: 1px solid var(--background-modifier-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;"><span></span><div style="background-color: rgba(255, 165, 0, 0.15); border: 1px solid orange; border-radius: 6px; padding: 8px 10px; color: var(--text-normal); font-size: 0.9em;">⚠️ Status Warning: This building is marked as In Progress, so some sections of this page may be incomplete.</div></div>
 
@@ -88,7 +88,7 @@
 > _No .mcstructure files currently imported._
 
 
-> Last Updated: 09-23-2026 06:50 AM
+> Last Updated: 09-23-2026 06:56 AM
 
 <div class="obsidian-only-toolbox">
 
