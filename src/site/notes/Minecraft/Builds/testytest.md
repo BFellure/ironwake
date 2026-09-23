@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/testytest/","updated":"2026-09-23T06:56:07.563-04:00","dg-note-properties":{"dimension":"Overworld","region":[[5]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":123,"builders":[[123]],"images":[],"structures":[],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/testytest/","updated":"2026-09-23T07:07:20.318-04:00","dg-note-properties":{"dimension":"Overworld","region":[[5]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":123,"builders":[[123]],"images":[],"structures":[],"tasks":["Fill out Overview Section","Fill out Purpose Section","Fill out Design Section","Fill out Lore Section","Fill out Features Section","Fill out Notes Section"]}}
 ---
 
 *** 
@@ -75,20 +75,13 @@
 <br>
 
 > [!todo]- Logs
-> <div style="background-color: var(--background-secondary); border: 1px solid var(--background-modifier-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;"><span><div data-callout-metadata="" data-callout-fold="-" data-callout="note" class="callout is-collapsible is-collapsed node-insert-event"><div class="callout-title" dir="auto"><div class="callout-icon"><svg width="16" height="16"></svg></div><div class="callout-title-inner"><strong>🗺️ Planning - <a data-href="testytest" href="testytest" class="internal-link" target="_blank" rel="noopener nofollow">testytest</a> : 09-23-2026 (06:54 AM)</strong></div><div class="callout-fold is-collapsed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"></path></svg></div></div><div class="callout-content" style="display: none;">
-<ul>
-<li dir="auto"><strong>Playtime:</strong> 2:00 PM - 4:00 PM (2.0 hrs) | <strong>MC Nights:</strong> 234 to 234234</li>
-<li dir="auto"><strong>Summary:</strong> dsaffasdsdf</li>
-<li dir="auto"><strong>Project:</strong> <a data-href="testytest" href="testytest" class="internal-link" target="_blank" rel="noopener nofollow">testytest</a></li>
-<li dir="auto"><strong>Other Info:</strong> dasffassdfasdfasdf</li>
-</ul>
-</div></div></span></div>
+> <div style="background-color: var(--background-secondary); border: 1px solid var(--background-modifier-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;"><span></span></div>
 
 > [!example]- Linked Structure Files
 > _No .mcstructure files currently imported._
 
 
-> Last Updated: 09-23-2026 06:56 AM
+> Last Updated: 09-23-2026 07:07 AM
 
 <div class="obsidian-only-toolbox">
 
