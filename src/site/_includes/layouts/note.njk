@@ -58,6 +58,57 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         {% include imp %}
       {% endfor %}
       {{ content | hideDataview | taggify | link | resolveMdLinks | safe}}
+<!-- Dynamic Build-Time Logs -->
+    <div class="callout callout-todo" data-callout="todo" style="margin-top: 2rem;">
+        <div class="callout-title"><div class="callout-icon">📋</div><div class="callout-title-inner">Logs</div></div>
+        <div class="callout-content" id="dynamic-logs-container">
+            <em>Loading logs...</em>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const container = document.getElementById("dynamic-logs-container");
+        const projectName = document.querySelector("h1") ? document.querySelector("h1").innerText.trim() : document.title.split('|')[0].trim();
+
+        try {
+            const response = await fetch('/logs.json');
+            const allLogs = await response.json();
+            
+            const projectLogs = allLogs.filter(log => log.project === projectName);
+            
+            if (projectLogs.length === 0) {
+                container.innerHTML = "<p><em>No logs recorded for this building yet.</em></p>";
+                return;
+            }
+
+            projectLogs.sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
+
+            const totalHours = projectLogs.reduce((sum, log) => sum + log.loggedHours, 0);
+
+            let html = `<small>⏱️ <b>Total Time Invested:</b> ${totalHours.toFixed(1)} hrs (${projectLogs.length} logs)</small><hr>`;
+
+            projectLogs.forEach(log => {
+                let formattedDate = log.date;
+                try {
+                    formattedDate = new Date(log.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                    if (isNaN(new Date(log.date))) formattedDate = log.date;
+                } catch(e) {}
+
+                html += `
+                    <div style="margin: 8px 0;">
+                        <a href="${log.url}"><b>📄 ${log.category} Log</b></a> — 📅 ${formattedDate} <em>(${log.loggedHours.toFixed(1)} hrs)</em>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        } catch (err) {
+            container.innerHTML = "<p><em>Could not load logs.</em></p>";
+            console.error(err);
+        }
+    });
+    </script>
       {% set slotName = "common.afterContent" %}{% include "components/pluginSlot.njk" %}
       {% set slotName = "notes.afterContent" %}{% include "components/pluginSlot.njk" %}
       {% for imp in dynamics.common.afterContent %}
