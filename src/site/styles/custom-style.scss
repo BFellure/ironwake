@@ -1,16 +1,11 @@
 body {
     /***
-      ADD YOUR CUSTOM STYLING HERE. (INSIDE THE body {...} section.)
-      IT WILL TAKE PRECEDENCE OVER THE STYLING IN THE STYLE.CSS FILE.
-   ***/
-    //  background-color: white;
-    //  .content {
-    //   font-size: 14px;
-    //  }
-    //  h1 {
-    //   color: black;
-    //  }
-    .obsidian-only-toolbox {
-    display: none !important;
+     ADD YOUR CUSTOM STYLING HERE. (INSIDE THE body {...} section.)
+     IT WILL TAKE PRECEDENCE OVER THE STYLING IN THE STYLE.CSS FILE.
+    ***/
 }
+
+/* Move this to the root level so it reliably hides across all web views */
+.obsidian-only-toolbox {
+    display: none !important;
 }
