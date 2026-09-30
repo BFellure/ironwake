@@ -1,0 +1,73 @@
+<div class="minecraft-dashboard">
+  {% set currentBuild = page.fileSlug %}
+
+  <!-- CHECKLISTS SECTION -->
+  <div class="callout callout-todo" style="border: 1px solid var(--interactive-accent); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <h3>📋 Checklists</h3>
+    
+    <h4>🔥 Active Checklists</h4>
+    <ul>
+      {%- for post in collections.note -%}
+        {%- if post.filePathStem.includes("/Minecraft/Checklists/Builds/" + currentBuild) -%}
+          {%- set status = post.data.status | lower -%}
+          {%- if status != 'completed' -%}
+            <li>
+              <a href="{{ post.url | url }}">{{ post.data.title or post.fileSlug }}</a> 
+              — 📊 {{ post.data.progress or '0.0%' }}
+            </li>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+
+    <hr style="margin: 10px 0;" />
+
+    <h4>✅ Completed Checklists</h4>
+    <ul>
+      {%- for post in collections.note -%}
+        {%- if post.filePathStem.includes("/Minecraft/Checklists/Builds/" + currentBuild) -%}
+          {%- set status = post.data.status | lower -%}
+          {%- if status == 'completed' -%}
+            <li>
+              <a href="{{ post.url | url }}">{{ post.data.title or post.fileSlug }}</a> 
+              — 📊 {{ post.data.progress or '100.0%' }}
+            </li>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  <!-- LOGS SECTION -->
+  <div class="callout callout-logs" style="border: 1px solid var(--interactive-accent); padding: 15px; border-radius: 8px;">
+    <h3>⏱️️ Logs</h3>
+    <ul>
+      {%- set totalHours = 0 -%}
+      {%- set logCount = 0 -%}
+      
+      {%- for post in collections.note -%}
+        {%- if post.data.project == currentBuild -%}
+          {%- if post.data['logged-hours'] -%}
+            {%- set totalHours = totalHours + post.data['logged-hours'] -%}
+          {%- endif -%}
+          {%- set logCount = logCount + 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      <p><small>⏱️ <strong>Total Time Invested:</strong> {{ totalHours | round(1) }} hrs ({{ logCount }} logs)</small></p>
+      <hr style="margin: 10px 0;" />
+
+      {%- for post in collections.note -%}
+        {%- if post.data.project == currentBuild -%}
+          <li>
+            <a href="{{ post.url | url }}">📄 {{ post.data.category or 'Building' }} Log</a> 
+            — 📅 {{ post.data.date }}
+            {%- if post.data['logged-hours'] -%}
+              <em>({{ post.data['logged-hours'] | round(1) }} hrs)</em>
+            {%- endif -%}
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
