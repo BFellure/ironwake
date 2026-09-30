@@ -89,7 +89,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     {% include "components/basesScript.njk" %}
     {% include "components/excalidrawScript.njk" %}
 
-  {% raw %}
+   {% raw %}
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
@@ -148,15 +148,12 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             checklists.forEach(item => {
                 let textContent = item.content || "";
                 
-                // Extract status from text content (e.g. "Status: Completed")
                 let statusMatch = textContent.match(/status[:\s]+([a-zA-Z]+)/i);
                 let status = statusMatch ? statusMatch[1].toLowerCase() : "";
 
-                // Extract progress from text content (e.g. "100.0%")
                 let progressMatch = textContent.match(/(\d+(?:\.\d+)?%)/);
                 let progress = progressMatch ? progressMatch[1] : "0.0%";
 
-                // Attach parsed attributes to item for later use
                 item.parsedStatus = status;
                 item.parsedProgress = progress;
 
@@ -220,6 +217,108 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                         <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
                     </div>
                     <div class="callout-content"><p><em>Unable to load checklists.</em></p></div>
+                </div>`;
+        }
+    });
+
+    // --- Logs Loader Script ---
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
+
+        let container = document.getElementById("vercel-logs-container");
+        if (!container) return;
+
+        let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
+        if (!currentBuildName) {
+            container.innerHTML = `
+                <div class="callout is-collapsed" data-callout="info" data-callout-fold="-">
+                    <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
+                        <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                        <div class="callout-title-inner">Building & Region Logs</div>
+                        <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                    </div>
+                    <div class="callout-content"><p><em>Could not determine build name.</em></p></div>
+                </div>`;
+            return;
+        }
+
+        try {
+            let response = await fetch('/searchIndex.json');
+            if (!response.ok) {
+                response = await fetch('/contentIndex.json');
+            }
+            if (!response.ok) throw new Error("Could not find site search index JSON.");
+            
+            let index = await response.json();
+            let pages = Array.isArray(index) ? index : Object.values(index);
+
+            let targetFolder = `minecraft/logs/building&region logs/${currentBuildName.toLowerCase()} logs`;
+            let logs = pages.filter(page => {
+                let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
+                return urlStr.includes(targetFolder);
+            });
+
+            logs.sort((a, b) => {
+                let dateA = new Date(a.date || a.fileSlug || 0);
+                let dateB = new Date(b.date || b.fileSlug || 0);
+                return dateB - dateA;
+            });
+
+            let totalHours = 0;
+            logs.forEach(item => {
+                let textContent = item.content || "";
+                let hoursMatch = textContent.match(/logged-hours[:\s]+([\d\.]+)/i);
+                if (hoursMatch) {
+                    totalHours += parseFloat(hoursMatch[1]) || 0;
+                }
+            });
+
+            let html = `
+            <div class="callout is-collapsed" data-callout="info" data-callout-fold="-">
+                <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
+                    <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                    <div class="callout-title-inner">Building & Region Logs (${logs.length}) — ⏱️ ${totalHours.toFixed(1)} hrs</div>
+                    <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                </div>
+                <div class="callout-content">`;
+
+            if (logs.length === 0) {
+                html += `<p><em>No logs recorded for this building yet.</em></p></div></div>`;
+                container.innerHTML = html;
+                return;
+            }
+
+            logs.forEach(item => {
+                let title = item.title || item.fileSlug || "Log Entry";
+                let url = item.url || item.permalink || `#`;
+                let textContent = item.content || "";
+                
+                let hoursMatch = textContent.match(/logged-hours[:\s]+([\d\.]+)/i);
+                let hoursStr = hoursMatch ? ` <em>(${parseFloat(hoursMatch[1]).toFixed(1)} hrs)</em>` : "";
+                
+                let categoryMatch = textContent.match(/category[:\s]+([a-zA-Z]+)/i);
+                let category = categoryMatch ? categoryMatch[1] : "Building";
+
+                html += `
+                <div class="callout" data-callout="example" style="margin: 8px 0;">
+                    <div class="callout-content" style="padding: 8px 12px;">
+                        <a href="${url}"><strong>📄 ${category} Log</strong></a> — ${title}${hoursStr}
+                    </div>
+                </div>`;
+            });
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+        } catch (err) {
+            console.error("Log loader error:", err);
+            container.innerHTML = `
+                <div class="callout is-collapsed" data-callout="info" data-callout-fold="-">
+                    <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
+                        <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                        <div class="callout-title-inner">Building & Region Logs</div>
+                        <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                    </div>
+                    <div class="callout-content"><p><em>Unable to load logs.</em></p></div>
                 </div>`;
         }
     });
