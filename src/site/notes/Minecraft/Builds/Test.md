@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T14:55:58.930-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T14:58:23.746-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
 ---
 
 ***
@@ -57,37 +57,52 @@
 <script>
 (async () => {
     try {
-        // Option: Fetch from a static JSON manifest of your vault data if you generate one, 
-        // or query the GitHub API directly for your published checklist folder:
-        let response = await fetch('https://api.github.com/repos/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/contents/Minecraft/Checklists/Builds/' + encodeURIComponent(window.location.pathname.split('/').pop()));
+        // Digital Garden / Quartz generates a static index.json or content index on deployment
+        let response = await fetch('/static/searchIndex.json').catch(() => fetch('/index.json'));
+        if (!response.ok) throw new Error("Index not found");
         
-        if (!response.ok) throw new Error("Could not fetch checklists.");
-        
-        let files = await response.json();
+        let data = await response.json();
         let container = document.getElementById('checklist-results');
         container.innerHTML = "";
+
+        // Extract the current build's name from the URL path
+        let pathSegments = window.location.pathname.split('/').filter(Boolean);
+        let currentBuildSlug = pathSegments[pathSegments.length - 1] || "";
+
+        // Filter the JSON data for checklists belonging to this build
+        let checklists = [];
+        // Support both Quartz v3/v4 and DG structure index formats
+        let entries = Array.isArray(data) ? data : (data.results || Object.values(data));
         
-        if (Array.isArray(files) && files.length > 0) {
+        for (let entry of entries) {
+            let url = entry.url || entry.slug || entry.path || "";
+            // Look for checklist files mapped to this build folder/naming convention
+            if (url.includes('Minecraft/Checklists/Builds/') && url.toLowerCase().includes(currentBuildSlug.toLowerCase())) {
+                checklists.push({
+                    title: entry.title || entry.fileContent?.substring(0, 30) || "Checklist",
+                    url: "/" + url.replace(/^\/+/, '')
+                });
+            }
+        }
+
+        if (checklists.length > 0) {
             let ul = document.createElement('ul');
-            ul.style.css = "margin: 0; padding-left: 20px;";
-            
-            for (let file of files) {
-                if (file.name.endsWith('.md')) {
-                    let li = document.createElement('li');
-                    let a = document.createElement('a');
-                    a.href = `/${file.path.replace('.md', '')}`;
-                    a.textContent = file.name.replace('.md', '');
-                    a.className = "internal-link";
-                    li.appendChild(a);
-                    ul.appendChild(li);
-                }
+            ul.style.cssText = "margin: 0; padding-left: 20px;";
+            for (let item of checklists) {
+                let li = document.createElement('li');
+                let a = document.createElement('a');
+                a.href = item.url;
+                a.textContent = item.title;
+                a.className = "internal-link";
+                li.appendChild(a);
+                ul.appendChild(li);
             }
             container.appendChild(ul);
         } else {
-            container.innerHTML = "<em>No checklists found for this build.</em>";
+            container.innerHTML = "<em>No active checklists found for this build.</em>";
         }
     } catch (err) {
-        document.getElementById('checklist-results').innerHTML = "<em>Unable to load live checklists.</em>";
+        document.getElementById('checklist-results').innerHTML = "<em>No checklists available.</em>";
     }
 })();
 </script>
@@ -100,7 +115,7 @@
 > [!example]- Linked Structure Files
 > _No .mcstructure files currently imported._
 
-> Last Updated: 09-30-2026 02:55 PM
+> Last Updated: 09-30-2026 02:58 PM
 ---
 <div class="obsidian-only-toolbox">
 
