@@ -89,7 +89,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     {% include "components/basesScript.njk" %}
     {% include "components/excalidrawScript.njk" %}
 
-   <script>
+  <script>
 document.addEventListener("DOMContentLoaded", async () => {
     if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
 
@@ -103,23 +103,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
-        let response = await fetch('/contentIndex.json');
-        if (!response.ok) throw new Error("Failed to fetch contentIndex.json");
+        // Digital Garden Eleventy uses searchIndex.json for client-side queries
+        let response = await fetch('/searchIndex.json');
+        if (!response.ok) {
+            response = await fetch('/contentIndex.json'); // fallback
+        }
+        if (!response.ok) throw new Error("Could not find site search index JSON.");
+        
         let index = await response.json();
-        
         let pages = Array.isArray(index) ? index : Object.values(index);
-        
-        // Debug: log all paths to your browser console (F12) so you can see how Digital Garden stores them
-        console.log("DG Pages Index:", pages);
 
-        // Flexible matching: checks if the path or url contains "Checklist" and the build name
+        // Filter files matching your exact folder path: Minecraft/Checklists/[Build Name]/
         let checklists = pages.filter(page => {
-            let pathStr = (page.path || page.url || "").toLowerCase();
-            return pathStr.includes(currentBuildName.toLowerCase()) && pathStr.includes("checklist");
+            let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
+            let targetFolder = `minecraft/checklists/${currentBuildName.toLowerCase()}`;
+            return urlStr.includes(targetFolder) && urlStr.includes("checklist");
         });
 
         if (checklists.length === 0) {
-            container.innerHTML = `<p><em>No checklists found for "${currentBuildName}".</em></p>`;
+            container.innerHTML = `<p><em>No checklists found under Minecraft/Checklists/${currentBuildName}/.</em></p>";
             return;
         }
 
@@ -157,7 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         container.innerHTML = html;
     } catch (err) {
         console.error("Checklist loader error:", err);
-        container.innerHTML = "<p><em>Unable to load checklists (Check console for details).</em></p>";
+        container.innerHTML = "<p><em>Unable to load checklists.</em></p>";
     }
 });
 </script>
