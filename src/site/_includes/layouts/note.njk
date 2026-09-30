@@ -225,7 +225,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     });
     </script>
 
-  <!-- LOGS LOADER SCRIPT (Using ContentIndex for Frontmatter) -->
+ <!-- LOGS LOADER SCRIPT (Extracts hours from content text) -->
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const logsDebug = [];
@@ -273,11 +273,9 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         }
 
         try {
-            // Try fetching contentIndex.json first as it contains full frontmatter
-            logDebug("Fetching contentIndex.json for frontmatter access...");
+            logDebug("Fetching search index for logs...");
             let response = await fetch('/contentIndex.json');
             if (!response.ok) {
-                logDebug("contentIndex.json not found, falling back to searchIndex.json...");
                 response = await fetch('/searchIndex.json');
             }
             if (!response.ok) throw new Error("Could not fetch site index JSON.");
@@ -286,57 +284,42 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             let pages = Array.isArray(index) ? index : Object.values(index);
             logDebug("Index loaded successfully.", { totalPages: pages.length });
 
-            let targetFolderFragment = `logs/building&region logs/${currentBuildName.toLowerCase()} logs/`;
-            logDebug("Target folder search fragment:", { targetFolderFragment });
-
             let matchedLogs = [];
             pages.forEach((item, indexNum) => {
                 let urlStr = (item.url || item.permalink || item.path || "").toLowerCase();
                 let titleStr = (item.title || item.fileSlug || "").toLowerCase();
 
-                if (urlStr.includes(targetFolderFragment) || (urlStr.includes("logs/") && urlStr.includes(currentBuildName.toLowerCase()))) {
-                    // Check frontmatter locations: item.frontmatter, item.data, or direct item properties
-                    let fm = item.frontmatter || item.data || item;
-
-                    logDebug(`--- Matched Page #${indexNum} ---`, {
-                        title: item.title,
-                        url: urlStr,
-                        keys: Object.keys(item),
-                        fmKeys: Object.keys(fm)
-                    });
-
+                if (urlStr.includes("logs/") && urlStr.includes(currentBuildName.toLowerCase())) {
                     let textContent = item.content || "";
+                    let title = item.title || item.fileSlug || "Log Entry";
 
-                    let dateMatch = fm.date || item.date || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || "";
-                    let timeMatch = fm.time || item.time || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
+                    // Extract Date (from item.date or title or content)
+                    let dateMatch = item.date || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || "";
                     
-                    // Retrieve logged-hours from frontmatter variations
-                    let rawHours = fm['logged-hours'] || fm.loggedHours || item['logged-hours'] || item.loggedHours;
-                    
-                    logDebug(`Hours inspection for "${item.title || item.fileSlug}":`, {
-                        "fm['logged-hours']": fm['logged-hours'],
-                        "fm.loggedHours": fm.loggedHours,
-                        "resolvedRawHours": rawHours
+                    // Extract Time from title string (e.g. "4.04PM" or "3:57 PM") or content
+                    let timeMatch = (titleStr.match(/(\d{1,2}[.:]\d{2}\s*(?:AM|PM))/i) || [])[1] || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
+
+                    // Extract hours from text content body matching formats like (*22.0 hrs*) or 22.0 hrs
+                    let hoursMatch = textContent.match(/\(\*?\s*([\d\.]+)\s*hrs\s*\*?\)/i) || textContent.match(/([\d\.]+)\s*hrs/i);
+                    let parsedHours = hoursMatch ? parseFloat(hoursMatch[1]) : 0;
+
+                    // Determine category from title or content
+                    let categoryMatch = titleStr.includes("building log") ? "Building" : "Region";
+
+                    logDebug(`Parsed Log #${indexNum}:`, {
+                        title: title,
+                        date: dateMatch,
+                        time: timeMatch,
+                        parsedHours: parsedHours
                     });
-
-                    if (rawHours === undefined || rawHours === null || rawHours === "") {
-                        let hoursReg = textContent.match(/logged-hours[:\s]+([\d\.]+)/i);
-                        rawHours = hoursReg ? hoursReg[1] : 0;
-                        logDebug(`Regex fallback hours parsed from content:`, rawHours);
-                    }
-
-                    let categoryMatch = fm.category || item.category || (textContent.match(/category[:\s]+["']?([^\r\n"']+)["']?/i) || [])[1] || "Building";
-
-                    let parsedHours = parseFloat(rawHours) || 0;
-                    logDebug(`Final parsed hours for this log: ${parsedHours}`);
 
                     matchedLogs.push({
-                        title: item.title || item.fileSlug || "Log Entry",
+                        title: title,
                         url: item.url || item.permalink || "#",
                         date: dateMatch.trim(),
                         time: timeMatch.trim(),
                         loggedHours: parsedHours,
-                        category: categoryMatch.trim()
+                        category: categoryMatch
                     });
                 }
             });
@@ -367,15 +350,8 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
             function formatTime(timeStr) {
                 if (!timeStr) return '';
+                timeStr = timeStr.replace('.', ':');
                 if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) return ` at ${timeStr}`;
-                let parts = timeStr.split(':');
-                if (parts.length >= 2) {
-                    let h = parseInt(parts[0], 10);
-                    let m = parts[1];
-                    let ampm = h >= 12 ? 'PM' : 'AM';
-                    h = h % 12 || 12;
-                    return ` at ${h}:${m} ${ampm}`;
-                }
                 return ` at ${timeStr}`;
             }
 
