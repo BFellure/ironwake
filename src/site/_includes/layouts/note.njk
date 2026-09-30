@@ -221,15 +221,29 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         }
     });
 
-    // --- Logs Loader Script ---
+    // --- DEBUG Logs Loader Script ---
     document.addEventListener("DOMContentLoaded", async () => {
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
+        console.log("[DEBUG Logs] DOMContentLoaded fired for logs loader script.");
+
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            console.log("[DEBUG Logs] Running on localhost/127.0.0.1 — skipping execution.");
+            return;
+        }
 
         let container = document.getElementById("vercel-logs-container");
-        if (!container) return;
+        console.log("[DEBUG Logs] Container element found:", container);
+        if (!container) {
+            console.warn("[DEBUG Logs] #vercel-logs-container element not found in DOM!");
+            return;
+        }
 
-        let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
+        let h1El = document.querySelector("h1");
+        let currentBuildName = h1El?.innerText?.trim() || "";
+        console.log("[DEBUG Logs] Extracted H1 element:", h1El);
+        console.log("[DEBUG Logs] Parsed currentBuildName:", `"${currentBuildName}"`);
+
         if (!currentBuildName) {
+            console.warn("[DEBUG Logs] Could not determine build name from H1.");
             container.innerHTML = `
                 <div class="callout is-collapsed" data-callout="info" data-callout-fold="-">
                     <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
@@ -243,20 +257,26 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         }
 
         try {
+            console.log("[DEBUG Logs] Fetching search index (/searchIndex.json)...");
             let response = await fetch('/searchIndex.json');
             if (!response.ok) {
+                console.log("[DEBUG Logs] /searchIndex.json failed with status", response.status, "— trying /contentIndex.json...");
                 response = await fetch('/contentIndex.json');
             }
-            if (!response.ok) throw new Error("Could not find site search index JSON.");
+            if (!response.ok) throw new Error(`Could not find site search index JSON. Status: ${response.status}`);
             
             let index = await response.json();
             let pages = Array.isArray(index) ? index : Object.values(index);
+            console.log(`[DEBUG Logs] Successfully loaded index. Total pages found in index: ${pages.length}`);
 
             let targetFolder = `minecraft/logs/building&region logs/${currentBuildName.toLowerCase()} logs`;
+            console.log("[DEBUG Logs] Target folder path filter:", `"${targetFolder}"`);
+
             let logs = pages.filter(page => {
                 let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
                 return urlStr.includes(targetFolder);
             });
+            console.log(`[DEBUG Logs] Filter matched ${logs.length} log pages:`, logs);
 
             logs.sort((a, b) => {
                 let dateA = new Date(a.date || a.fileSlug || 0);
@@ -265,13 +285,15 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             });
 
             let totalHours = 0;
-            logs.forEach(item => {
+            logs.forEach((item, idx) => {
                 let textContent = item.content || "";
                 let hoursMatch = textContent.match(/logged-hours[:\s]+([\d\.]+)/i);
+                console.log(`[DEBUG Logs] Item [${idx}] title: "${item.title || item.fileSlug}" | hoursMatch:`, hoursMatch ? hoursMatch[1] : "None");
                 if (hoursMatch) {
                     totalHours += parseFloat(hoursMatch[1]) || 0;
                 }
             });
+            console.log("[DEBUG Logs] Calculated totalHours:", totalHours);
 
             let html = `
             <div class="callout is-collapsed" data-callout="info" data-callout-fold="-">
@@ -283,6 +305,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 <div class="callout-content">`;
 
             if (logs.length === 0) {
+                console.log("[DEBUG Logs] No matching logs found. Rendering empty state.");
                 html += `<p><em>No logs recorded for this building yet.</em></p></div></div>`;
                 container.innerHTML = html;
                 return;
@@ -309,8 +332,9 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
             html += `</div></div>`;
             container.innerHTML = html;
+            console.log("[DEBUG Logs] Logs container successfully populated.");
         } catch (err) {
-            console.error("Log loader error:", err);
+            console.error("[DEBUG Logs] Caught error during log loading execution:", err);
             container.innerHTML = `
                 <div class="callout is-collapsed" data-callout="info" data-callout-fold="-">
                     <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
