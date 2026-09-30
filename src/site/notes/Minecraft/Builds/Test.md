@@ -1,8 +1,7 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T13:27:07.163-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["building"],"updated":"2026-09-30T13:46:57.561-04:00","dg-note-properties":{"tags":["building"],"finish_date":"In Progress"}}
 ---
 
-***
 
 <div style="background-color: var(--background-secondary); border: 1px solid var(--background-modifier-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;"><span></span><div style="background-color: rgba(255, 165, 0, 0.15); border: 1px solid orange; border-radius: 6px; padding: 8px 10px; color: var(--text-normal); font-size: 0.9em;">⚠️ Status Warning: This building is marked as In Progress, so some sections of this page may be incomplete.</div></div>
 
@@ -16,15 +15,15 @@
 
 ---
 
-|                  |                                                             |
-|------------------|-------------------------------------------------------------|
+|                 |                                                             |
+|-----------------|-------------------------------------------------------------|
 | **[[Dimensions\|Dimension:]]**   | Overworld                                                   |
 | **[[Locations\|Location:]]**    | [[Minecraft/Builds/Test\|Test]]                                                   |
-| **Coordinates:** | 1, 1, 1                    |
+| **Coordinates:** | 1, 1, 1                                    |
 | **Start Date:**  | Planning                                             |
 | **Finish Date:** | In Progress                                            |
-| **[[Building Types\|Building Type:]]** | Test                                               |
-| **[[Builders\|Builder(s):]]**  | [[Minecraft/Builds/Test\|Test]]                                                 |
+| **[[Building Types\|Building Type:]]** | Test                                                       |
+| **[[Builders\|Builder(s):]]**  | [[Minecraft/Builds/Test\|Test]]                                                   |
 
 ---
 ## <div style="text-align: center;">Overview</div>
@@ -49,7 +48,6 @@
 
 ## <div style="text-align: center;"><u>Records & Tracking</u></div>
 
-
 <div class="obsidian-only-toolbox">
 
 > [!success]- Checklists
@@ -70,6 +68,8 @@
 
 </div>
 
+<div class="obsidian-only-toolbox">
+
 > [!todo]- Logs
 > <p><span><em>No logs recorded for this building yet.</em></span></p>
 
@@ -78,7 +78,7 @@
 > [!example]- Linked Structure Files
 > _No .mcstructure files currently imported._
 
-> Last Updated: 09-30-2026 01:27 PM
+> Last Updated: 09-30-2026 01:46 PM
 ---
 <div class="obsidian-only-toolbox">
 
