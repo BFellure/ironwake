@@ -90,77 +90,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     {% include "components/excalidrawScript.njk" %}
 
     {% raw %}
-    <!-- ========================================== -->
-    <!-- COMPANION DEBUG MONITOR (NON-INTRUSIVE)    -->
-    <!-- ========================================== -->
-    <script>
-    (function() {
-        const logs = [];
-        function record(msg, data) {
-            const time = new Date().toISOString().split('T')[1].slice(0, -1);
-            const entry = `[${time}] ${msg}` + (data !== undefined ? ` ${JSON.stringify(data)}` : '');
-            logs.push(entry);
-            console.log("[StandaloneDebugMonitor]", msg, data !== undefined ? data : '');
-        }
-
-        window.addEventListener("DOMContentLoaded", async () => {
-            record("DOM fully loaded. Inspecting environment...");
-            record("Hostname:", window.location.hostname);
-            
-            const container = document.getElementById("vercel-checklists-container");
-            record("Container #vercel-checklists-container found?", !!container);
-
-            const h1 = document.querySelector("h1");
-            record("Heading <h1> found?", !!h1);
-            record("Build name extracted (h1 innerText):", h1 ? h1.innerText.trim() : null);
-
-            // Test fetching indices independently
-            try {
-                record("Testing fetch for /searchIndex.json...");
-                let res = await fetch('/searchIndex.json');
-                record("/searchIndex.json status:", res.status);
-                if (res.ok) {
-                    let json = await res.json();
-                    let arr = Array.isArray(json) ? json : Object.values(json);
-                    record("/searchIndex.json total entries:", arr.length);
-                    
-                    if (h1) {
-                        let buildName = h1.innerText.trim().toLowerCase();
-                        let targetFolder = `minecraft/checklists/builds/${buildName}`;
-                        let matches = arr.filter(p => {
-                            let u = (p.url || p.permalink || p.path || "").toLowerCase();
-                            return u.includes(targetFolder) && u.includes("checklist");
-                        });
-                        record(`Matching checklist pages found for target folder '${targetFolder}':`, matches.length);
-                        if (matches.length === 0 && arr.length > 0) {
-                            record("Sample page URL from index for comparison:", arr[0].url || arr[0].permalink || arr[0].path);
-                        }
-                    }
-                } else {
-                    let res2 = await fetch('/contentIndex.json');
-                    record("/contentIndex.json status:", res2.status);
-                }
-            } catch (err) {
-                record("Fetch test error:", err.message);
-            }
-
-            // Inject a visible debug panel at the bottom of the page if container exists or as floating element
-            setTimeout(() => {
-                const targetBox = document.getElementById("vercel-checklists-container") || document.querySelector("main");
-                if (targetBox && !document.getElementById("standalone-debug-panel")) {
-                    const debugDiv = document.createElement("div");
-                    debugDiv.id = "standalone-debug-panel";
-                    debugDiv.style.cssText = "margin: 20px 0; padding: 12px; background: rgba(0,0,0,0.05); border: 1px solid var(--callout-border, #ccc); border-radius: 6px; font-size: 12px;";
-                    debugDiv.innerHTML = `<details><summary><strong>🛠️ Standalone Checklist Debug Report</strong></summary><pre style="white-space: pre-wrap; margin-top: 8px; font-family: monospace;">${logs.join('\n')}</pre></details>`;
-                    targetBox.appendChild(debugDiv);
-                }
-            }, 1000);
-        });
-    })();
-    </script>
-    {% endraw %}
-
-    {% raw %}
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
@@ -287,11 +216,172 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
                     <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
                         <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg></div>
-                      \t<div class="callout-title-inner">Checklists</div>
+                        <div class="callout-title-inner">Checklists</div>
                         <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
                     </div>
                     <div class="callout-content"><p><em>Unable to load checklists.</em></p></div>
                 </div>`;
+        }
+    });
+    </script>
+
+    <!-- LOGS LOADER SCRIPT (Mirrors DataviewJS Logs logic + Debugging) -->
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const logsDebug = [];
+        function logDebug(msg, data = null) {
+            const time = new Date().toISOString().split('T')[1].slice(0, -1);
+            const entry = `[${time}] ${msg}` + (data ? ` ${JSON.stringify(data)}` : '');
+            logsDebug.push(entry);
+            console.log(`[LogsDebug]`, msg, data || '');
+        }
+
+        logDebug("Logs loader initialized.");
+
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            logDebug("Localhost environment detected. Halting logs script.");
+            return;
+        }
+
+        let container = document.getElementById("vercel-logs-container");
+        logDebug("Container lookup:", { containerFound: !!container, id: "vercel-logs-container" });
+        if (!container) return;
+
+        let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
+        logDebug("Current build name from <h1>:", { currentBuildName });
+
+        function buildCalloutShell(contentHtml, isError = false) {
+            const debugBox = `<details style="font-size: 11px; opacity: 0.85; margin-top: 12px; border-top: 1px dashed var(--callout-border); padding-top: 6px;"><summary><strong>🛠️ Logs Debug Report</strong></summary><pre style="white-space: pre-wrap; font-family: monospace; font-size: 10px; margin-top: 6px;">${logsDebug.join('\n')}</pre></details>`;
+            return `
+            <div class="callout is-collapsed" data-callout="todo" data-callout-fold="-">
+                <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
+                    <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-todo"><rect x="3" y="5" width="6" height="6" rx="1"/><path d="m3 17 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg></div>
+                    <div class="callout-title-inner">Logs</div>
+                    <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                </div>
+                <div class="callout-content">
+                    ${contentHtml}
+                    ${debugBox}
+                </div>
+            </div>`;
+        }
+
+        if (!currentBuildName) {
+            logDebug("ERROR: Build name empty.");
+            container.innerHTML = buildCalloutShell(`<p><em>Could not determine building name.</em></p>`, true);
+            return;
+        }
+
+        try {
+            logDebug("Fetching search index for logs...");
+            let response = await fetch('/searchIndex.json');
+            if (!response.ok) {
+                logDebug("searchIndex.json failed. Trying contentIndex.json fallback.");
+                response = await fetch('/contentIndex.json');
+            }
+            if (!response.ok) throw new Error("Could not fetch site search index JSON.");
+
+            let index = await response.json();
+            let pages = Array.isArray(index) ? index : Object.values(index);
+            logDebug("Search index loaded successfully.", { totalPages: pages.length });
+
+            // Filter pages from Minecraft/Logs path
+            let logPages = pages.filter(page => {
+                let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
+                return urlStr.includes("minecraft/logs");
+            });
+            logDebug("Filtered pages in 'minecraft/logs' folder:", { count: logPages.length });
+
+            // Parse metadata and filter by target building name (p.project === targetName)
+            let matchedLogs = [];
+            logPages.forEach(item => {
+                let textContent = item.content || "";
+                
+                // Match project attribute
+                let projectMatch = item.project || (textContent.match(/project[:\s]+["']?([^\r\n"']+)["']?/i) || [])[1] || "";
+                
+                if (projectMatch.trim().toLowerCase() === currentBuildName.toLowerCase()) {
+                    let dateMatch = item.date || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || "";
+                    let timeMatch = item.time || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
+                    let hoursMatch = item['logged-hours'] || item.loggedHours || (textContent.match(/logged-hours[:\s]+([\d\.]+)/i) || [])[1] || 0;
+                    let categoryMatch = item.category || (textContent.match(/category[:\s]+["']?([^\r\n"']+)["']?/i) || [])[1] || "Building";
+
+                    matchedLogs.push({
+                        title: item.title || item.fileSlug || "Log Entry",
+                        url: item.url || item.permalink || "#",
+                        date: dateMatch.trim(),
+                        time: timeMatch.trim(),
+                        loggedHours: parseFloat(hoursMatch) || 0,
+                        category: categoryMatch.trim()
+                    });
+                }
+            });
+
+            logDebug("Matched logs for project '" + currentBuildName + "':", { matchedCount: matchedLogs.length });
+
+            if (matchedLogs.length === 0) {
+                container.innerHTML = buildCalloutShell(`<p><em>No logs recorded for this building yet.</em></p>`);
+                return;
+            }
+
+            // Sort logs descending by date and time (matching DataviewJS logic)
+            matchedLogs.sort((a, b) => {
+                let dateTimeA = `${a.date} ${a.time || '00:00'}`;
+                let dateTimeB = `${b.date} ${b.time || '00:00'}`;
+                return dateTimeB.localeCompare(dateTimeA);
+            });
+
+            // Calculate total hours invested
+            let totalHours = matchedLogs.reduce((sum, log) => sum + log.loggedHours, 0);
+            logDebug("Calculated stats:", { totalHours: totalHours.toFixed(1), totalLogs: matchedLogs.length });
+
+            // Date formatting helper
+            function formatDate(dateStr) {
+                if (!dateStr) return '';
+                let d = new Date(dateStr + "T00:00:00");
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+
+            // Time formatting helper
+            function formatTime(timeStr) {
+                if (!timeStr) return '';
+                if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) return ` at ${timeStr}`;
+                let parts = timeStr.split(':');
+                if (parts.length >= 2) {
+                    let h = parseInt(parts[0], 10);
+                    let m = parts[1];
+                    let ampm = h >= 12 ? 'PM' : 'AM';
+                    h = h % 12 || 12;
+                    return ` at ${h}:${m} ${ampm}`;
+                }
+                return ` at ${timeStr}`;
+            }
+
+            // Construct HTML response matching Dataview paragraph layout
+            let htmlContent = `
+            <p><small>⏱️ <strong>Total Time Invested:</strong> ${totalHours.toFixed(1)} hrs (${matchedLogs.length} logs)</small></p>
+            <hr style="border: none; border-top: 1px solid var(--callout-border); margin: 8px 0;">`;
+
+            matchedLogs.forEach(log => {
+                let formattedDate = formatDate(log.date);
+                let formattedTime = formatTime(log.time);
+                let entryHours = log.loggedHours > 0 ? ` <em>(${log.loggedHours.toFixed(1)} hrs)</em>` : '';
+
+                htmlContent += `
+                <div class="callout" data-callout="example" style="margin: 8px 0;">
+                    <div class="callout-content" style="padding: 8px 12px;">
+                        <strong><a href="${log.url}">📄 ${log.category} Log (${log.title})</a></strong> — 📅 ${formattedDate}${formattedTime}${entryHours}
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = buildCalloutShell(htmlContent);
+            logDebug("Logs successfully rendered to DOM.");
+        } catch (err) {
+            logDebug("CRITICAL ERROR during logs execution: " + err.message);
+            console.error("Logs loader error:", err);
+            container.innerHTML = buildCalloutShell(`<p><em>Unable to load logs for this building.</em></p>`, true);
         }
     });
     </script>
