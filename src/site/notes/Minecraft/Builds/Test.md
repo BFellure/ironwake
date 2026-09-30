@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T15:45:30.430-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T15:55:37.604-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
 ---
 
 ***
@@ -53,21 +53,12 @@
 <div id="vercel-checklists-container">Loading public checklists...</div>
 
 
-
-
-<div class="obsidian-only-toolbox">
-
-> [!todo]- Logs
-> <p><span><em>No logs recorded for this building yet.</em></span></p>
-
-</div>
-
-
+<div id="vercel-logs-container"></div>
 
 > [!example]- Linked Structure Files
 > _No .mcstructure files currently imported._
 
-> Last Updated: 09-30-2026 03:45 PM
+> Last Updated: 09-30-2026 03:55 PM
 ---
 <div class="obsidian-only-toolbox">
 
