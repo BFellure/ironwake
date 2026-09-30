@@ -225,13 +225,13 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     });
     </script>
 
-   <!-- LOGS LOADER SCRIPT -->
+   <!-- LOGS LOADER SCRIPT WITH ENHANCED DEBUGGING -->
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const logsDebug = [];
         function logDebug(msg, data = null) {
             const time = new Date().toISOString().split('T')[1].slice(0, -1);
-            const entry = `[${time}] ${msg}` + (data ? ` ${JSON.stringify(data)}` : '');
+            const entry = `[${time}] ${msg}` + (data ? ` ${JSON.stringify(data, null, 2)}` : '');
             logsDebug.push(entry);
             console.log(`[LogsDebug]`, msg, data || '');
         }
@@ -251,7 +251,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         logDebug("Current build name from <h1>:", { currentBuildName });
 
         function buildCalloutShell(contentHtml) {
-            const debugBox = `<details style="font-size: 11px; opacity: 0.85; margin-top: 12px; border-top: 1px dashed var(--callout-border); padding-top: 6px;"><summary><strong>🛠️️ Logs Debug Report</strong></summary><pre style="white-space: pre-wrap; font-family: monospace; font-size: 10px; margin-top: 6px;">${logsDebug.join('\n')}</pre></details>`;
+            const debugBox = `<details style="font-size: 11px; opacity: 0.85; margin-top: 12px; border-top: 1px dashed var(--callout-border); padding-top: 6px;"><summary><strong>🛠️ Logs Debug Report (Click to expand)</strong></summary><pre style="white-space: pre-wrap; font-family: monospace; font-size: 10px; margin-top: 6px; max-height: 300px; overflow-y: auto;">${logsDebug.join('\n\n')}</pre></details>`;
             return `
             <div class="callout is-collapsed" data-callout="todo" data-callout-fold="-">
                 <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
@@ -288,39 +288,57 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             logDebug("Target folder search fragment:", { targetFolderFragment });
 
             let matchedLogs = [];
-            pages.forEach(item => {
+            pages.forEach((item, indexNum) => {
                 let urlStr = (item.url || item.permalink || item.path || "").toLowerCase();
                 let titleStr = (item.title || item.fileSlug || "").toLowerCase();
 
                 if (urlStr.includes(targetFolderFragment) || (urlStr.includes("logs/") && urlStr.includes(currentBuildName.toLowerCase()))) {
-                    let textContent = item.content || "";
-                    let dataObj = item.data || item; // Check nested frontmatter data object or root item
+                    logDebug(`--- Matched Page #${indexNum} ---`, {
+                        title: item.title,
+                        url: urlStr,
+                        allItemKeys: Object.keys(item),
+                        hasDataObj: !!item.data,
+                        dataKeys: item.data ? Object.keys(item.data) : null
+                    });
 
-                    // Extract fields robustly from frontmatter object or content text regex
+                    let textContent = item.content || "";
+                    let dataObj = item.data || item; 
+
                     let dateMatch = dataObj.date || item.date || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || "";
                     let timeMatch = dataObj.time || item.time || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
                     
-                    // Look for logged-hours in data, item properties, or scan the raw text/content for "logged-hours: X"
+                    // Inspect various ways logged-hours could be named or stored
                     let rawHours = dataObj['logged-hours'] || dataObj.loggedHours || item['logged-hours'] || item.loggedHours;
-                    if (rawHours === undefined || rawHours === null) {
+                    logDebug(`Hours inspection for "${item.title || item.fileSlug}":`, {
+                        "dataObj['logged-hours']": dataObj['logged-hours'],
+                        "dataObj.loggedHours": dataObj.loggedHours,
+                        "item['logged-hours']": item['logged-hours'],
+                        "resolvedRawHours": rawHours
+                    });
+
+                    if (rawHours === undefined || rawHours === null || rawHours === "") {
                         let hoursReg = textContent.match(/logged-hours[:\s]+([\d\.]+)/i);
                         rawHours = hoursReg ? hoursReg[1] : 0;
+                        logDebug(`Regex fallback hours parsed from content:`, rawHours);
                     }
 
                     let categoryMatch = dataObj.category || item.category || (textContent.match(/category[:\s]+["']?([^\r\n"']+)["']?/i) || [])[1] || "Building";
+
+                    let parsedHours = parseFloat(rawHours) || 0;
+                    logDebug(`Final parsed hours for this log: ${parsedHours}`);
 
                     matchedLogs.push({
                         title: item.title || item.fileSlug || "Log Entry",
                         url: item.url || item.permalink || "#",
                         date: dateMatch.trim(),
                         time: timeMatch.trim(),
-                        loggedHours: parseFloat(rawHours) || 0,
+                        loggedHours: parsedHours,
                         category: categoryMatch.trim()
                     });
                 }
             });
 
-            logDebug("Matched logs found:", { count: matchedLogs.length, sample: matchedLogs[0] });
+            logDebug("Total matched logs found:", matchedLogs.length);
 
             if (matchedLogs.length === 0) {
                 container.innerHTML = buildCalloutShell(`<p><em>No logs recorded for this building yet.</em></p>`);
@@ -335,6 +353,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             });
 
             let totalHours = matchedLogs.reduce((sum, log) => sum + log.loggedHours, 0);
+            logDebug(`Calculated totalHours sum: ${totalHours}`);
 
             function formatDate(dateStr) {
                 if (!dateStr) return '';
