@@ -89,71 +89,77 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     {% include "components/basesScript.njk" %}
     {% include "components/excalidrawScript.njk" %}
 
-    <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
+   <script>
+document.addEventListener("DOMContentLoaded", async () => {
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
 
-        let container = document.getElementById("vercel-checklists-container");
-        if (!container) return;
+    let container = document.getElementById("vercel-checklists-container");
+    if (!container) return;
 
-        let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
-        if (!currentBuildName) {
-            container.innerHTML = "<p><em>Could not determine build name for checklists.</em></p>";
+    let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
+    if (!currentBuildName) {
+        container.innerHTML = "<p><em>Could not determine build name.</em></p>";
+        return;
+    }
+
+    try {
+        let response = await fetch('/contentIndex.json');
+        if (!response.ok) throw new Error("Failed to fetch contentIndex.json");
+        let index = await response.json();
+        
+        let pages = Array.isArray(index) ? index : Object.values(index);
+        
+        // Debug: log all paths to your browser console (F12) so you can see how Digital Garden stores them
+        console.log("DG Pages Index:", pages);
+
+        // Flexible matching: checks if the path or url contains "Checklist" and the build name
+        let checklists = pages.filter(page => {
+            let pathStr = (page.path || page.url || "").toLowerCase();
+            return pathStr.includes(currentBuildName.toLowerCase()) && pathStr.includes("checklist");
+        });
+
+        if (checklists.length === 0) {
+            container.innerHTML = `<p><em>No checklists found for "${currentBuildName}".</em></p>`;
             return;
         }
 
-        try {
-            let response = await fetch('/contentIndex.json');
-            let index = await response.json();
-            
-            let pages = Array.isArray(index) ? index : Object.values(index);
-            let checklists = pages.filter(page => {
-                return (page.url && page.url.includes(`Minecraft/Checklists/Builds/${currentBuildName}`)) || 
-                       (page.path && page.path.includes(`Minecraft/Checklists/Builds/${currentBuildName}`));
+        let activeLists = checklists.filter(p => !p.frontmatter?.status || p.frontmatter.status.toLowerCase() !== 'completed');
+        let completedLists = checklists.filter(p => p.frontmatter?.status && p.frontmatter.status.toLowerCase() === 'completed');
+
+        let html = `<div class="vercel-checklist-box">`;
+        
+        html += `<strong>🔥 Active Checklists (${activeLists.length})</strong><ul>`;
+        if (activeLists.length > 0) {
+            activeLists.forEach(item => {
+                let title = item.title || item.fileSlug || "Checklist";
+                let progress = item.frontmatter?.progress || '0.0%';
+                let url = item.url || item.permalink || `#`;
+                html += `<li><a href="${url}">${title}</a> — 📊 ${progress}</li>`;
             });
-
-            if (checklists.length === 0) {
-                container.innerHTML = "<p><em>No checklists created for this build yet.</em></p>";
-                return;
-            }
-
-            let activeLists = checklists.filter(p => !p.frontmatter?.status || p.frontmatter.status.toLowerCase() !== 'completed');
-            let completedLists = checklists.filter(p => p.frontmatter?.status && p.frontmatter.status.toLowerCase() === 'completed');
-
-            let html = `<div class="vercel-checklist-box">`;
-            
-            html += `<strong>🔥 Active Checklists (${activeLists.length})</strong><ul>`;
-            if (activeLists.length > 0) {
-                activeLists.forEach(item => {
-                    let title = item.title || item.fileSlug || "Checklist";
-                    let progress = item.frontmatter?.progress || '0.0%';
-                    let url = item.url || `#`;
-                    html += `<li><a href="${url}">${title}</a> — 📊 ${progress}</li>`;
-                });
-            } else {
-                html += `<li><em>No active checklists.</em></li>`;
-            }
-            html += `</ul><hr>`;
-
-            html += `<strong>✅ Completed Checklists (${completedLists.length})</strong><ul>`;
-            if (completedLists.length > 0) {
-                completedLists.forEach(item => {
-                    let title = item.title || item.fileSlug || "Checklist";
-                    let progress = item.frontmatter?.progress || '100.0%';
-                    let url = item.url || `#`;
-                    html += `<li><a href="${url}">${title}</a> — 📊 ${progress}</li>`;
-                });
-            } else {
-                html += `<li><em>No completed checklists.</em></li>`;
-            }
-            html += `</ul></div>`;
-
-            container.innerHTML = html;
-        } catch (err) {
-            console.error("Failed to load checklists from contentIndex:", err);
-            container.innerHTML = "<p><em>Error loading checklists.</em></p>";
+        } else {
+            html += `<li><em>No active checklists.</em></li>`;
         }
-    });
-    </script>
+        html += `</ul><hr>`;
+
+        html += `<strong>✅ Completed Checklists (${completedLists.length})</strong><ul>`;
+        if (completedLists.length > 0) {
+            completedLists.forEach(item => {
+                let title = item.title || item.fileSlug || "Checklist";
+                let progress = item.frontmatter?.progress || '100.0%';
+                let url = item.url || item.permalink || `#`;
+                html += `<li><a href="${url}">${title}</a> — 📊 ${progress}</li>`;
+            });
+        } else {
+            html += `<li><em>No completed checklists.</em></li>`;
+        }
+        html += `</ul></div>`;
+
+        container.innerHTML = html;
+    } catch (err) {
+        console.error("Checklist loader error:", err);
+        container.innerHTML = "<p><em>Unable to load checklists (Check console for details).</em></p>";
+    }
+});
+</script>
   </body>
 </html>
