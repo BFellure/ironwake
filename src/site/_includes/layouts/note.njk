@@ -1,95 +1,4 @@
----
-permalink: "notes/{{ page.fileSlug | slugify }}/"
----
-<!DOCTYPE html>
-<html lang="{{ meta.mainLanguage }}">
-  <head>
-    <title>{% if title %}{{ title }}{% else %}{{ page.fileSlug }}{% endif %}</title>
-    {%include "components/pageheader.njk"%}
-    {% set slotName = "common.head" %}{% include "components/pluginSlot.njk" %}
-    {% set slotName = "notes.head" %}{% include "components/pluginSlot.njk" %}
-    {% for imp in dynamics.common.head %}
-      {% include imp %}
-    {% endfor %}
-    {% for imp in dynamics.notes.head %}
-      {% include imp %}
-    {% endfor %}
-  </head>
-  <body class="theme-{{meta.baseTheme}} markdown-preview-view markdown-rendered markdown-preview-section {% if settings.dgShowFileTree !== true %}no-filetree{% endif %} {% if settings.dgHomeLink === true and settings.dgShowFileTree !== true %}has-navbar{% endif %} {{meta.bodyClasses}}">
-    {%include "components/notegrowthhistory.njk"%}
-
-    {% set regionName = "navigation" %}
-    {% set regionFallback = "components/navbar.njk" %}
-    {% include "components/pluginRegion.njk" %}
-
-    <main class="content cm-s-obsidian print {{contentClasses}}">
-      <header>
-        {% if settings.dgShowInlineTitle === true %}
-          <h1 data-note-icon="{% if noteIcon %}{{noteIcon}}{% else %}{{meta.noteIconsSettings.default}}{% endif %}">{% if title %}{{ title }}{% else %}{{ page.fileSlug }}{% endif %}</h1>
-        {% endif %}
-        <div class="header-meta">
-          {% if settings.dgShowTags === true and tags %}
-            <div class="header-tags">
-              {% for tag in tags %}
-                {% if tag != 'gardenEntry' and tag !='note' %}
-                  <a class="tag">
-                    #{{tag}}
-                  </a>
-                {% endif %}
-              {% endfor %}
-            </div>
-          {% endif %}
-        </div>
-      {% set slotName = "common.header" %}{% include "components/pluginSlot.njk" %}
-      {% set slotName = "notes.header" %}{% include "components/pluginSlot.njk" %}
-      {% for imp in dynamics.common.header %}
-        {% include imp %}
-      {% endfor %}
-      {% for imp in dynamics.notes.header %}
-        {% include imp %}
-      {% endfor %}
-      </header>
-      {% set slotName = "common.beforeContent" %}{% include "components/pluginSlot.njk" %}
-      {% set slotName = "notes.beforeContent" %}{% include "components/pluginSlot.njk" %}
-      {% for imp in dynamics.common.beforeContent %}
-        {% include imp %}
-      {% endfor %}
-      {% for imp in dynamics.notes.beforeContent %}
-        {% include imp %}
-      {% endfor %}
-      {{ content | hideDataview | taggify | link | resolveMdLinks | safe}}
-      {% set slotName = "common.afterContent" %}{% include "components/pluginSlot.njk" %}
-      {% set slotName = "notes.afterContent" %}{% include "components/pluginSlot.njk" %}
-      {% for imp in dynamics.common.afterContent %}
-        {% include imp %}
-      {% endfor %}
-      {% for imp in dynamics.notes.afterContent %}
-        {% include imp %}
-      {% endfor %}
-    </main>
-
-    {% if settings.dgShowBacklinks === true or settings.dgShowLocalGraph === true or settings.dgShowToc === true or dynamics.sidebar.top.length > 0 or dynamics.sidebar.bottom.length > 0 or plugins.slots["sidebar.top"] or plugins.slots["sidebar.bottom"] %}
-      {%include "components/sidebar.njk"%}
-    {% endif %}
-    {% include "components/floatingActions.njk" %}
-
-    {% include "components/references.njk" %}
-    {% set slotName = "common.footer" %}{% include "components/pluginSlot.njk" %}
-    {% set slotName = "notes.footer" %}{% include "components/pluginSlot.njk" %}
-    {% for imp in dynamics.common.footer %}
-      {% include imp %}
-    {% endfor %}
-    {% for imp in dynamics.notes.footer %}
-      {% include imp %}
-    {% endfor %}
-    {%include "components/lucideIcons.njk"%}
-    {% if contentClasses and "canvas-page" in contentClasses %}
-      {%include "components/canvasScript.njk"%}
-    {% endif %}
-    {% include "components/basesScript.njk" %}
-    {% include "components/excalidrawScript.njk" %}
-
-    {% raw %}
+{% raw %}
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
@@ -173,7 +82,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 completedLists.forEach(item => {
                     let rawTitle = item.title || item.fileSlug || "Checklist";
                     let match = rawTitle.match(/^[^-]+-\s*(.*?)\s*Checklist$/i);
-       v            let projectName = match ? match[1] : rawTitle;
+                    let projectName = match ? match[1] : rawTitle;
                     let progress = item.frontmatter?.progress || '100.0%';
                     let url = item.url || item.permalink || `#`;
                     
@@ -189,7 +98,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             }
 
             html += `</div></div>`;
-
             container.innerHTML = html;
         } catch (err) {
             console.error("Checklist loader error:", err);
@@ -206,5 +114,3 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     });
     </script>
     {% endraw %}
-  </body>
-</html>
