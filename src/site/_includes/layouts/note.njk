@@ -142,8 +142,17 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 return;
             }
 
-            let activeLists = checklists.filter(p => !p.frontmatter?.status || p.frontmatter.status.toLowerCase() !== 'completed');
-            let completedLists = checklists.filter(p => p.frontmatter?.status && p.frontmatter.status.toLowerCase() === 'completed');
+            let activeLists = [];
+            let completedLists = [];
+
+            checklists.forEach(item => {
+                let status = (item.frontmatter?.status || item.status || item.data?.status || "").toString().trim().toLowerCase();
+                if (status === "completed" || status === "complete") {
+                    completedLists.push(item);
+                } else {
+                    activeLists.push(item);
+                }
+            });
 
             html += `<p><strong>🔥 Active Checklists (${activeLists.length})</strong></p>`;
             
@@ -152,7 +161,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                     let rawTitle = item.title || item.fileSlug || "Checklist";
                     let match = rawTitle.match(/^[^-]+-\s*(.*?)\s*Checklist$/i);
                     let projectName = match ? match[1] : rawTitle;
-                    let progress = item.frontmatter?.progress || '0.0%';
+                    let progress = item.frontmatter?.progress || item.progress || item.data?.progress || '0.0%';
                     let url = item.url || item.permalink || `#`;
                     
                     html += `
@@ -174,7 +183,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                     let rawTitle = item.title || item.fileSlug || "Checklist";
                     let match = rawTitle.match(/^[^-]+-\s*(.*?)\s*Checklist$/i);
                     let projectName = match ? match[1] : rawTitle;
-                    let progress = item.frontmatter?.progress || '100.0%';
+                    let progress = item.frontmatter?.progress || item.progress || item.data?.progress || '100.0%';
                     let url = item.url || item.permalink || `#`;
                     
                     html += `
