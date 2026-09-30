@@ -1,5 +1,5 @@
 <div class="minecraft-dashboard">
-  {% set currentBuild = page.fileSlug %}
+  {% set currentBuild = page.fileSlug or title | slugify %}
 
   <!-- CHECKLISTS SECTION -->
   <div class="callout callout-todo" style="border: 1px solid var(--interactive-accent); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
@@ -7,10 +7,12 @@
     
     <h4>🔥 Active Checklists</h4>
     <ul>
+      {%- set activeFound = false -%}
       {%- for post in collections.note -%}
-        {%- if post.filePathStem.includes("/Minecraft/Checklists/Builds/" + currentBuild) -%}
-          {%- set status = post.data.status | lower -%}
+        {%- if post.filePathStem and currentBuild and post.filePathStem.includes("/Minecraft/Checklists/Builds/" + currentBuild) -%}
+          {%- set status = (post.data.status or '') | lower -%}
           {%- if status != 'completed' -%}
+            {%- set activeFound = true -%}
             <li>
               <a href="{{ post.url | url }}">{{ post.data.title or post.fileSlug }}</a> 
               — 📊 {{ post.data.progress or '0.0%' }}
@@ -18,16 +20,21 @@
           {%- endif -%}
         {%- endif -%}
       {%- endfor -%}
+      {%- if not activeFound -%}
+        <li><em>No active checklists found.</em></li>
+      {%- endif -%}
     </ul>
 
     <hr style="margin: 10px 0;" />
 
     <h4>✅ Completed Checklists</h4>
     <ul>
+      {%- set completedFound = false -%}
       {%- for post in collections.note -%}
-        {%- if post.filePathStem.includes("/Minecraft/Checklists/Builds/" + currentBuild) -%}
-          {%- set status = post.data.status | lower -%}
+        {%- if post.filePathStem and currentBuild and post.filePathStem.includes("/Minecraft/Checklists/Builds/" + currentBuild) -%}
+          {%- set status = (post.data.status or '') | lower -%}
           {%- if status == 'completed' -%}
+            {%- set completedFound = true -%}
             <li>
               <a href="{{ post.url | url }}">{{ post.data.title or post.fileSlug }}</a> 
               — 📊 {{ post.data.progress or '100.0%' }}
@@ -35,39 +42,50 @@
           {%- endif -%}
         {%- endif -%}
       {%- endfor -%}
+      {%- if not completedFound -%}
+        <li><em>No completed checklists found.</em></li>
+      {%- endif -%}
     </ul>
   </div>
 
   <!-- LOGS SECTION -->
   <div class="callout callout-logs" style="border: 1px solid var(--interactive-accent); padding: 15px; border-radius: 8px;">
-    <h3>⏱️️ Logs</h3>
-    <ul>
-      {%- set totalHours = 0 -%}
-      {%- set logCount = 0 -%}
-      
-      {%- for post in collections.note -%}
-        {%- if post.data.project == currentBuild -%}
-          {%- if post.data['logged-hours'] -%}
-            {%- set totalHours = totalHours + post.data['logged-hours'] -%}
-          {%- endif -%}
-          {%- set logCount = logCount + 1 -%}
+    <h3>⏱ Logs</h3>
+    
+    {%- set totalHours = 0 -%}
+    {%- set logCount = 0 -%}
+    
+    {# First pass to calculate totals safely #}
+    {%- for post in collections.note -%}
+      {%- if post.data.project and currentBuild and post.data.project == currentBuild -%}
+        {%- if post.data['logged-hours'] -%}
+          {%- set totalHours = totalHours + (post.data['logged-hours'] | float) -%}
         {%- endif -%}
-      {%- endfor -%}
+        {%- set logCount = logCount + 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
 
-      <p><small>⏱️ <strong>Total Time Invested:</strong> {{ totalHours | round(1) }} hrs ({{ logCount }} logs)</small></p>
-      <hr style="margin: 10px 0;" />
+    <p><small>⏱️ <strong>Total Time Invested:</strong> {{ totalHours | round(1) }} hrs ({{ logCount }} logs)</small></p>
+    <hr style="margin: 10px 0;" />
 
+    <ul>
+      {%- set logListFound = false -%}
       {%- for post in collections.note -%}
-        {%- if post.data.project == currentBuild -%}
+        {%- if post.data.project and currentBuild and post.data.project == currentBuild -%}
+          {%- set logListFound = true -%}
           <li>
             <a href="{{ post.url | url }}">📄 {{ post.data.category or 'Building' }} Log</a> 
-            — 📅 {{ post.data.date }}
+            — 📅 {{ post.data.date or 'Unknown Date' }}
             {%- if post.data['logged-hours'] -%}
-              <em>({{ post.data['logged-hours'] | round(1) }} hrs)</em>
+              <em>({{ post.data['logged-hours'] | float | round(1) }} hrs)</em>
             {%- endif -%}
           </li>
         {%- endif -%}
       {%- endfor -%}
+      
+      {%- if not logListFound -%}
+        <li><em>No logs recorded for this building yet.</em></li>
+      {%- endif -%}
     </ul>
   </div>
 </div>
