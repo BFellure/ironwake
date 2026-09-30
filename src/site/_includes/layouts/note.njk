@@ -225,7 +225,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     });
     </script>
 
-<!-- LOGS LOADER SCRIPT (Pixel-Perfect Obsidian Match) -->
+<!-- LOGS LOADER SCRIPT (Fixed Date Match) -->
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const logsDebug = [];
@@ -293,7 +293,10 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                     let textContent = item.content || "";
                     let title = item.title || item.fileSlug || "Log Entry";
 
-                    let dateMatch = item.date || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || "";
+                    // Safely extract YYYY-MM-DD from item.date, title, or content frontmatter
+                    let rawDateVal = typeof item.date === 'string' ? item.date : (item.date && item.date.toString ? item.date.toString() : '');
+                    let dateMatch = rawDateVal.match(/(\d{4}-\d{2}-\d{2})/)?.[1] || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || "";
+                    
                     let timeMatch = (titleStr.match(/(\d{1,2}[.:]\d{2}\s*(?:AM|PM))/i) || [])[1] || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
 
                     let hoursMatch = textContent.match(/\(\*?\s*([\d\.]+)\s*hrs\s*\*?\)/i) || textContent.match(/([\d\.]+)\s*hrs/i);
@@ -328,11 +331,15 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
             let totalHours = matchedLogs.reduce((sum, log) => sum + log.loggedHours, 0);
 
+            // Clean local date string formatter (avoids GMT object printing)
             function formatDate(dateStr) {
                 if (!dateStr) return '';
                 let parts = dateStr.split('-');
                 if (parts.length === 3) {
-                    let d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    let year = parseInt(parts[0], 10);
+                    let month = parseInt(parts[1], 10) - 1;
+                    let day = parseInt(parts[2], 10);
+                    let d = new Date(year, month, day);
                     return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
                 }
                 return dateStr;
@@ -340,8 +347,11 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
             function formatTime(timeStr) {
                 if (!timeStr) return '';
-                timeStr = timeStr.replace('.', ':');
-                if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) return ` at ${timeStr}`;
+                timeStr = timeStr.replace('.', ':').toUpperCase();
+                if (timeStr.includes('AM') || timeStr.includes('PM')) {
+                    // Ensure space before AM/PM matches Obsidian
+                    return ` at ${timeStr.replace(/([AP]M)/, ' $1')}`;
+                }
                 let parts = timeStr.split(':');
                 if (parts.length >= 2) {
                     let h = parseInt(parts[0], 10);
@@ -353,7 +363,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 return ` at ${timeStr}`;
             }
 
-            // Match Dataview blockquote header style precisely
             let htmlContent = `
             <blockquote style="margin: 0 0 12px 0; padding-left: 12px; border-left: 3px solid var(--interactive-accent);">
                 <small style="font-size: 0.95em;">⏱️ <strong>Total Time Invested:</strong> ${totalHours.toFixed(1)} hrs (${matchedLogs.length} logs)</small>
@@ -365,7 +374,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 let formattedTime = formatTime(log.time);
                 let entryHours = log.loggedHours > 0 ? ` <em>(${log.loggedHours.toFixed(1)} hrs)</em>` : '';
 
-                // Use 'abstract' callout with the list bullet icon element to match Dataview output
                 htmlContent += `
                 <div class="callout" data-callout="abstract" style="margin: 8px 0;">
                     <div class="callout-title" style="pointer-events: none; min-height: unset; padding: 8px 12px;">
