@@ -51,37 +51,6 @@
 
 
 
-<div class="obsidian-only-toolbox">
-
-> [!success]- Checklists
-> <div style="text-align: center;">
-> 
-> <button class="obsidian-only-toolbox" style="background-color: var(--interactive-accent); color: var(--text-on-accent); border: none; border-radius: 6px; padding: 8px 14px; font-weight: 500; cursor: pointer; width: 100%; font-size: 0.95em;"><span>📋 Create Checklist from Template</span></button>
-> </div>
->
-> <p><span><blockquote dir="auto">
-<p><strong>🔥 Active Checklists (1)</strong></p>
-</blockquote></span></p><p><span><div data-callout-metadata="" data-callout-fold="" data-callout="example" class="callout node-insert-event"><div class="callout-title" dir="auto"><div class="callout-icon"><svg width="16" height="16"></svg></div><div class="callout-title-inner"><strong><a data-tooltip-position="top" aria-label="Test - Test Checklist" data-href="Test - Test Checklist" href="Test - Test Checklist" class="internal-link" target="_blank" rel="noopener nofollow">Test</a></strong> — 📊 0.0%</div></div></div></span></p><p><span><blockquote dir="auto">
-<hr>
-</blockquote></span></p><p><span><blockquote dir="auto">
-<p><strong>✅ Completed Checklists (0)</strong></p>
-</blockquote></span></p><p><span><blockquote dir="auto">
-<p><em>No completed checklists found.</em></p>
-</blockquote></span></p>
-
-</div>
-
-
-
-
-
-
-<div class="obsidian-only-toolbox">
-
-> [!todo]- Logs
-> <p><span><em>No logs recorded for this building yet.</em></span></p>
-
-</div>
 
 
 
