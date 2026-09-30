@@ -225,7 +225,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     });
     </script>
 
- <!-- LOGS LOADER SCRIPT (Dataview Format Match) -->
+<!-- LOGS LOADER SCRIPT (Pixel-Perfect Obsidian Match) -->
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const logsDebug = [];
@@ -330,21 +330,34 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
             function formatDate(dateStr) {
                 if (!dateStr) return '';
-                let d = new Date(dateStr + "T00:00:00");
-                if (isNaN(d.getTime())) return dateStr;
-                return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                let parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    let d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                }
+                return dateStr;
             }
 
             function formatTime(timeStr) {
                 if (!timeStr) return '';
                 timeStr = timeStr.replace('.', ':');
                 if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) return ` at ${timeStr}`;
+                let parts = timeStr.split(':');
+                if (parts.length >= 2) {
+                    let h = parseInt(parts[0], 10);
+                    let m = parts[1];
+                    let ampm = h >= 12 ? 'PM' : 'AM';
+                    h = h % 12 || 12;
+                    return ` at ${h}:${m} ${ampm}`;
+                }
                 return ` at ${timeStr}`;
             }
 
-            // Exact match to dv.paragraph formatting
+            // Match Dataview blockquote header style precisely
             let htmlContent = `
-            <p><small>⏱️ <strong>Total Time Invested:</strong> ${totalHours.toFixed(1)} hrs (${matchedLogs.length} logs)</small></p>
+            <blockquote style="margin: 0 0 12px 0; padding-left: 12px; border-left: 3px solid var(--interactive-accent);">
+                <small style="font-size: 0.95em;">⏱️ <strong>Total Time Invested:</strong> ${totalHours.toFixed(1)} hrs (${matchedLogs.length} logs)</small>
+            </blockquote>
             <hr style="border: none; border-top: 1px solid var(--callout-border); margin: 8px 0;">`;
 
             matchedLogs.forEach(log => {
@@ -352,10 +365,14 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 let formattedTime = formatTime(log.time);
                 let entryHours = log.loggedHours > 0 ? ` <em>(${log.loggedHours.toFixed(1)} hrs)</em>` : '';
 
+                // Use 'abstract' callout with the list bullet icon element to match Dataview output
                 htmlContent += `
-                <div class="callout" data-callout="example" style="margin: 8px 0;">
-                    <div class="callout-content" style="padding: 8px 12px;">
-                        <strong><a href="${log.url}">📄 ${log.category} Log</a></strong> — 📅 ${formattedDate}${formattedTime}${entryHours}
+                <div class="callout" data-callout="abstract" style="margin: 8px 0;">
+                    <div class="callout-title" style="pointer-events: none; min-height: unset; padding: 8px 12px;">
+                        <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+                        <div class="callout-title-inner" style="font-size: 0.9em; font-weight: normal;">
+                            <strong><a href="${log.url}">📄 ${log.category} Log</a></strong> — 📅 ${formattedDate}${formattedTime}${entryHours}
+                        </div>
                     </div>
                 </div>`;
             });
