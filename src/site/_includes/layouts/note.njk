@@ -91,15 +91,32 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
    {% raw %}
     <script>
-    // --- Working Checklists Loader Script ---
     document.addEventListener("DOMContentLoaded", async () => {
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
+        // --- Debug Log Reporter ---
+        const debugLogs = [];
+        function logDebug(message, data = null) {
+            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+            const logEntry = `[${timestamp}] ${message}` + (data ? ` ${JSON.stringify(data)}` : '');
+            debugLogs.push(logEntry);
+            console.log(`[ChecklistDebug]`, message, data || '');
+        }
+
+        logDebug("DOMContentLoaded fired. Initializing script.");
+
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            logDebug("Localhost environment detected. Aborting execution.");
+            return;
+        }
 
         let container = document.getElementById("vercel-checklists-container");
+        logDebug("Container element lookup result:", { found: !!container, id: "vercel-checklists-container" });
         if (!container) return;
 
         let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
+        logDebug("Extracted current build name from <h1>:", { currentBuildName });
+
         if (!currentBuildName) {
+            logDebug("Build name could not be determined. Rendering error callout.");
             container.innerHTML = `
                 <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
                     <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
@@ -113,20 +130,26 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         }
 
         try {
+            logDebug("Fetching search index from /searchIndex.json");
             let response = await fetch('/searchIndex.json');
             if (!response.ok) {
+                logDebug("searchIndex.json failed with status " + response.status + ". Falling back to /contentIndex.json");
                 response = await fetch('/contentIndex.json');
             }
             if (!response.ok) throw new Error("Could not find site search index JSON.");
             
             let index = await response.json();
             let pages = Array.isArray(index) ? index : Object.values(index);
+            logDebug("Search index loaded successfully.", { totalPages: pages.length });
 
             let targetFolder = `minecraft/checklists/builds/${currentBuildName.toLowerCase()}`;
+            logDebug("Target folder constructed:", { targetFolder });
+
             let checklists = pages.filter(page => {
                 let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
                 return urlStr.includes(targetFolder) && urlStr.includes("checklist");
             });
+            logDebug("Filtered checklists matching target folder and keyword:", { matchedCount: checklists.length });
 
             let html = `
             <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
@@ -138,7 +161,13 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 <div class="callout-content">`;
 
             if (checklists.length === 0) {
+                logDebug("No checklists found for this build. Appending empty state message.");
                 html += `<p><em>No checklists created for this build yet.</em></p></div></div>`;
+                
+                // Append Debug Section to content
+                html += `<hr style="border: none; border-top: 1px dashed var(--callout-border); margin: 12px 0;">
+                         <details style="font-size: 11px; opacity: 0.8;"><summary><strong>🛠️ Checklist Debug Report</strong></summary><pre style="white-space: pre-wrap; margin-top: 6px;">${debugLogs.join('\n')}</pre></details>`;
+                
                 container.innerHTML = html;
                 return;
             }
@@ -149,12 +178,15 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             checklists.forEach(item => {
                 let textContent = item.content || "";
                 
+                // Extract status from text content (e.g. "Status: Completed")
                 let statusMatch = textContent.match(/status[:\s]+([a-zA-Z]+)/i);
                 let status = statusMatch ? statusMatch[1].toLowerCase() : "";
 
+                // Extract progress from text content (e.g. "100.0%")
                 let progressMatch = textContent.match(/(\d+(?:\.\d+)?%)/);
                 let progress = progressMatch ? progressMatch[1] : "0.0%";
 
+                // Attach parsed attributes to item for later use
                 item.parsedStatus = status;
                 item.parsedProgress = progress;
 
@@ -164,6 +196,8 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                     activeLists.push(item);
                 }
             });
+
+            logDebug("Checklists categorized.", { activeCount: activeLists.length, completedCount: completedLists.length });
 
             html += `<p><strong>🔥 Active Checklists (${activeLists.length})</strong></p>`;
             
@@ -206,10 +240,17 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 html += `<p><em>No completed checklists found.</em></p>`;
             }
 
+            // Append Debug Report section inside the collapsible callout
+            logDebug("Rendering complete HTML structure with debug logs report.");
+            html += `<hr style="border: none; border-top: 1px dashed var(--callout-border); margin: 12px 0;">
+                     <details style="font-size: 11px; opacity: 0.8;"><summary><strong>🛠️ Checklist Debug Report</strong></summary><pre style="white-space: pre-wrap; margin-top: 6px;">${debugLogs.join('\n')}</pre></details>`;
+
             html += `</div></div>`;
             container.innerHTML = html;
         } catch (err) {
             console.error("Checklist loader error:", err);
+            logDebug("CRITICAL ERROR caught during execution: " + err.message);
+            
             container.innerHTML = `
                 <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
                     <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
@@ -217,118 +258,15 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                         <div class="callout-title-inner">Checklists</div>
                         <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
                     </div>
-                    <div class="callout-content"><p><em>Unable to load checklists.</em></p></div>
-                </div>`;
-        }
-    });
-
-    // --- Logs Loader Script Matching Layout ---
-    document.addEventListener("DOMContentLoaded", async () => {
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
-
-        let container = document.getElementById("vercel-logs-container");
-        if (!container) return;
-
-        let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
-        if (!currentBuildName) {
-            container.innerHTML = `
-                <div class="callout is-collapsed" data-callout="info" data-callout-fold="-">
-                    <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
-                        <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-                        <div class="callout-title-inner">Logs</div>
-                        <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                    <div class="callout-content">
+                        <p><em>Unable to load checklists.</em></p>
+                        <hr style="border: none; border-top: 1px dashed var(--callout-border); margin: 12px 0;">
+                        <details style="font-size: 11px; opacity: 0.8;"><summary><strong>🛠️ Checklist Debug Report (Error State)</strong></summary><pre style="white-space: pre-wrap; margin-top: 6px;">${debugLogs.join('\n')}</pre></details>
                     </div>
-                    <div class="callout-content"><p><em>Could not determine note name.</em></p></div>
-                </div>`;
-            return;
-        }
-
-        try {
-            let response = await fetch('/searchIndex.json');
-            if (!response.ok) {
-                response = await fetch('/contentIndex.json');
-            }
-            if (!response.ok) throw new Error("Could not find site search index JSON.");
-            
-            let index = await response.json();
-            let pages = Array.isArray(index) ? index : Object.values(index);
-
-            let targetFolder = `minecraft/logs/building&region logs/${currentBuildName.toLowerCase()} logs`;
-            let logs = pages.filter(page => {
-                let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
-                return urlStr.includes(targetFolder);
-            });
-
-            logs.sort((a, b) => {
-                let dateA = new Date(a.date || a.fileSlug || 0);
-                let dateB = new Date(b.date || b.fileSlug || 0);
-                return dateB - dateA;
-            });
-
-            let totalHours = 0;
-            logs.forEach(item => {
-                let textContent = item.content || "";
-                let hoursMatch = textContent.match(/logged-hours[:\s]+([\d\.]+)/i);
-                if (hoursMatch) {
-                    totalHours += parseFloat(hoursMatch[1]) || 0;
-                }
-            });
-
-            let html = `
-            <div class="callout is-collapsed" data-callout="info" data-callout-fold="-">
-                <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
-                    <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-                    <div class="callout-title-inner">Logs</div>
-                    <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
-                </div>
-                <div class="callout-content">
-                    <div style="border-left: 3px solid var(--callout-border); padding-left: 12px; margin-bottom: 12px;">
-                        <p><strong>⏱️ Total Time Invested: ${totalHours.toFixed(1)} hrs (${logs.length} log${logs.length === 1 ? '' : 's'})</strong></p>
-                    </div>`;
-
-            if (logs.length === 0) {
-                html += `<p><em>No logs recorded for this note yet.</em></p></div></div>`;
-                container.innerHTML = html;
-                return;
-            }
-
-            logs.forEach(item => {
-                let url = item.url || item.permalink || `#`;
-                let textContent = item.content || "";
-                
-                let hoursMatch = textContent.match(/logged-hours[:\s]+([\d\.]+)/i);
-                let hoursStr = hoursMatch ? ` <em>(${parseFloat(hoursMatch[1]).toFixed(1)} hrs)</em>` : "";
-                
-                let categoryMatch = textContent.match(/category[:\s]+([a-zA-Z]+)/i);
-                let category = categoryMatch ? categoryMatch[1] : "Building";
-
-                let rawDate = item.date ? new Date(item.date) : new Date();
-                let dateFormatted = !isNaN(rawDate) ? rawDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' at ' + rawDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : "Recent";
-
-                html += `
-                <div class="callout" data-callout="example" style="margin: 8px 0;">
-                    <div class="callout-content" style="padding: 8px 12px;">
-                        📄 <a href="${url}"><strong>${category} Log</strong></a> — 📅 ${dateFormatted}${hoursStr}
-                    </div>
-                </div>`;
-            });
-
-            html += `</div></div>`;
-            container.innerHTML = html;
-        } catch (err) {
-            console.error("Logs loader error:", err);
-            container.innerHTML = `
-                <div class="callout is-collapsed" data-callout="info" data-callout-fold="-">
-                    <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
-                        <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-                        <div class="callout-title-inner">Logs</div>
-                        <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
-                    </div>
-                    <div class="callout-content"><p><em>Unable to load logs.</em></p></div>
                 </div>`;
         }
     });
     </script>
-    {% endraw %}
+{% endraw %}
   </body>
 </html>
