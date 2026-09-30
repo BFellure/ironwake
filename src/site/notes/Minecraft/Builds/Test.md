@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T13:55:05.226-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T14:14:09.116-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
 ---
 
 ***
@@ -16,15 +16,15 @@
 
 ---
 
-|                  |                                                             |
+|                 |                                                             |
 |------------------|-------------------------------------------------------------|
 | **[[Dimensions\|Dimension:]]**   | Overworld                                                   |
-| **[[Locations\|Location:]]**    | [[Minecraft/Builds/Test\|Test]]                                                   |
-| **Coordinates:** | 1, 1, 1                    |
-| **Start Date:**  | Planning                                             |
-| **Finish Date:** | In Progress                                            |
-| **[[Building Types\|Building Type:]]** | Test                                               |
-| **[[Builders\|Builder(s):]]**  | [[Minecraft/Builds/Test\|Test]]                                                 |
+| **[[Locations\|Location:]]**    | [[Minecraft/Builds/Test\|Test]]                                                    |
+| **Coordinates:** | 1, 1, 1                                    |
+| **Start Date:**  | Planning                                                   |
+| **Finish Date:** | In Progress                                                 |
+| **[[Building Types\|Building Type:]]** | Test                                                        |
+| **[[Builders\|Builder(s):]]**  | [[Minecraft/Builds/Test\|Test]]                                                    |
 
 ---
 ## <div style="text-align: center;">Overview</div>
@@ -78,7 +78,7 @@
 > [!example]- Linked Structure Files
 > _No .mcstructure files currently imported._
 
-> Last Updated: 09-30-2026 01:55 PM
+> Last Updated: 09-30-2026 02:14 PM
 ---
 <div class="obsidian-only-toolbox">
 
