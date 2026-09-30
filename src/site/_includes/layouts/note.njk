@@ -95,9 +95,14 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
 
         let container = document.getElementById("vercel-checklists-container");
-        if (!container) return;
+        if (!container) {
+            console.warn("DEBUG: #vercel-checklists-container not found on this page.");
+            return;
+        }
 
         let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
+        console.log("DEBUG: Current Build Name (H1):", currentBuildName);
+
         if (!currentBuildName) {
             container.innerHTML = `
                 <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
@@ -120,12 +125,17 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             
             let index = await response.json();
             let pages = Array.isArray(index) ? index : Object.values(index);
+            console.log("DEBUG: Total pages loaded from index:", pages.length);
 
             let targetFolder = `minecraft/checklists/builds/${currentBuildName.toLowerCase()}`;
+            console.log("DEBUG: Target Folder Filter:", targetFolder);
+
             let checklists = pages.filter(page => {
                 let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
                 return urlStr.includes(targetFolder) && urlStr.includes("checklist");
             });
+
+            console.log("DEBUG: Filtered Checklists Found:", checklists);
 
             let html = `
             <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
@@ -147,6 +157,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
             checklists.forEach(item => {
                 let status = (item.frontmatter?.status || item.status || item.data?.status || "").toString().trim().toLowerCase();
+                console.log(`DEBUG: Checklist [${item.title || item.fileSlug}] detected status: "${status}"`, item);
                 if (status === "completed" || status === "complete") {
                     completedLists.push(item);
                 } else {
@@ -200,7 +211,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             html += `</div></div>`;
             container.innerHTML = html;
         } catch (err) {
-            console.error("Checklist loader error:", err);
+            console.error("DEBUG: Checklist loader crashed:", err);
             container.innerHTML = `
                 <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
                     <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
@@ -208,7 +219,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                         <div class="callout-title-inner">Checklists</div>
                         <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
                     </div>
-                    <div class="callout-content"><p><em>Unable to load checklists.</em></p></div>
+                    <div class="callout-content"><p><em>Unable to load checklists (Debug Error).</em></p></div>
                 </div>`;
         }
     });
