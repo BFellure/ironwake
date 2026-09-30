@@ -225,7 +225,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     });
     </script>
 
-    <!-- LOGS LOADER SCRIPT (Mirrors DataviewJS Logs logic + Debugging) -->
+    <!-- LOGS LOADER SCRIPT (Matches by Note Name folder path & filename structure) -->
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const logsDebug = [];
@@ -250,7 +250,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
         logDebug("Current build name from <h1>:", { currentBuildName });
 
-        function buildCalloutShell(contentHtml, isError = false) {
+        function buildCalloutShell(contentHtml) {
             const debugBox = `<details style="font-size: 11px; opacity: 0.85; margin-top: 12px; border-top: 1px dashed var(--callout-border); padding-top: 6px;"><summary><strong>🛠️ Logs Debug Report</strong></summary><pre style="white-space: pre-wrap; font-family: monospace; font-size: 10px; margin-top: 6px;">${logsDebug.join('\n')}</pre></details>`;
             return `
             <div class="callout is-collapsed" data-callout="todo" data-callout-fold="-">
@@ -268,7 +268,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
         if (!currentBuildName) {
             logDebug("ERROR: Build name empty.");
-            container.innerHTML = buildCalloutShell(`<p><em>Could not determine building name.</em></p>`, true);
+            container.innerHTML = buildCalloutShell(`<p><em>Could not determine building name.</em></p>`);
             return;
         }
 
@@ -276,7 +276,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             logDebug("Fetching search index for logs...");
             let response = await fetch('/searchIndex.json');
             if (!response.ok) {
-                logDebug("searchIndex.json failed. Trying contentIndex.json fallback.");
                 response = await fetch('/contentIndex.json');
             }
             if (!response.ok) throw new Error("Could not fetch site search index JSON.");
@@ -285,23 +284,20 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             let pages = Array.isArray(index) ? index : Object.values(index);
             logDebug("Search index loaded successfully.", { totalPages: pages.length });
 
-            // Filter pages from Minecraft/Logs path
-            let logPages = pages.filter(page => {
-                let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
-                return urlStr.includes("minecraft/logs");
-            });
-            logDebug("Filtered pages in 'minecraft/logs' folder:", { count: logPages.length });
+            let targetFolderFragment = `logs/building&region logs/${currentBuildName.toLowerCase()} logs/`;
+            logDebug("Target folder search fragment:", { targetFolderFragment });
 
-            // Parse metadata and filter by target building name (p.project === targetName)
             let matchedLogs = [];
-            logPages.forEach(item => {
-                let textContent = item.content || "";
-                
-                // Match project attribute
-                let projectMatch = item.project || (textContent.match(/project[:\s]+["']?([^\r\n"']+)["']?/i) || [])[1] || "";
-                
-                if (projectMatch.trim().toLowerCase() === currentBuildName.toLowerCase()) {
-                    let dateMatch = item.date || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || "";
+            pages.forEach(item => {
+                let urlStr = (item.url || item.permalink || item.path || "").toLowerCase();
+                let titleStr = (item.title || item.fileSlug || "").toLowerCase();
+
+                // Check if page lives in this note's specific log folder path or has the building name in path
+                if (urlStr.includes(targetFolderFragment) || (urlStr.includes("logs/") && urlStr.includes(currentBuildName.toLowerCase()))) {
+                    let textContent = item.content || "";
+
+                    // Extract frontmatter properties if available, fallback to regex parsing from content or filename
+                    let dateMatch = item.date || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || "";
                     let timeMatch = item.time || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
                     let hoursMatch = item['logged-hours'] || item.loggedHours || (textContent.match(/logged-hours[:\s]+([\d\.]+)/i) || [])[1] || 0;
                     let categoryMatch = item.category || (textContent.match(/category[:\s]+["']?([^\r\n"']+)["']?/i) || [])[1] || "Building";
@@ -317,25 +313,22 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 }
             });
 
-            logDebug("Matched logs for project '" + currentBuildName + "':", { matchedCount: matchedLogs.length });
+            logDebug("Matched logs found:", { matchedCount: matchedLogs.length });
 
             if (matchedLogs.length === 0) {
                 container.innerHTML = buildCalloutShell(`<p><em>No logs recorded for this building yet.</em></p>`);
                 return;
             }
 
-            // Sort logs descending by date and time (matching DataviewJS logic)
+            // Sort descending by date and time
             matchedLogs.sort((a, b) => {
                 let dateTimeA = `${a.date} ${a.time || '00:00'}`;
                 let dateTimeB = `${b.date} ${b.time || '00:00'}`;
                 return dateTimeB.localeCompare(dateTimeA);
             });
 
-            // Calculate total hours invested
             let totalHours = matchedLogs.reduce((sum, log) => sum + log.loggedHours, 0);
-            logDebug("Calculated stats:", { totalHours: totalHours.toFixed(1), totalLogs: matchedLogs.length });
 
-            // Date formatting helper
             function formatDate(dateStr) {
                 if (!dateStr) return '';
                 let d = new Date(dateStr + "T00:00:00");
@@ -343,7 +336,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
             }
 
-            // Time formatting helper
             function formatTime(timeStr) {
                 if (!timeStr) return '';
                 if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) return ` at ${timeStr}`;
@@ -358,7 +350,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 return ` at ${timeStr}`;
             }
 
-            // Construct HTML response matching Dataview paragraph layout
             let htmlContent = `
             <p><small>⏱️ <strong>Total Time Invested:</strong> ${totalHours.toFixed(1)} hrs (${matchedLogs.length} logs)</small></p>
             <hr style="border: none; border-top: 1px solid var(--callout-border); margin: 8px 0;">`;
@@ -381,7 +372,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         } catch (err) {
             logDebug("CRITICAL ERROR during logs execution: " + err.message);
             console.error("Logs loader error:", err);
-            container.innerHTML = buildCalloutShell(`<p><em>Unable to load logs for this building.</em></p>`, true);
+            container.innerHTML = buildCalloutShell(`<p><em>Unable to load logs for this building.</em></p>`);
         }
     });
     </script>
