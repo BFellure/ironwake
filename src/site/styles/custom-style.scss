@@ -1,11 +1,12 @@
-body {
-    /***
-     ADD YOUR CUSTOM STYLING HERE. (INSIDE THE body {...} section.)
-     IT WILL TAKE PRECEDENCE OVER THE STYLING IN THE STYLE.CSS FILE.
-    ***/
+/* Target both the wrapper and any rendered callouts inside it on Digital Garden */
+.obsidian-only-toolbox,
+.nav-file-title, 
+.graph-view.color-fill {
+    display: none !important;
 }
 
-/* Hide elements with this class completely on the Digital Garden / Vercel site */
-.obsidian-only-toolbox {
+/* If Digital Garden renders the callout with specific classes */
+.cm-embed-block:has(.obsidian-only-toolbox),
+div[data-callout="success"]:has(.obsidian-only-toolbox) {
     display: none !important;
 }
