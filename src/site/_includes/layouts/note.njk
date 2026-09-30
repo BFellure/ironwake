@@ -89,20 +89,15 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     {% include "components/basesScript.njk" %}
     {% include "components/excalidrawScript.njk" %}
 
-    {% raw %}
+   {% raw %}
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
 
         let container = document.getElementById("vercel-checklists-container");
-        if (!container) {
-            console.warn("DEBUG: #vercel-checklists-container not found on this page.");
-            return;
-        }
+        if (!container) return;
 
         let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
-        console.log("DEBUG: Current Build Name (H1):", currentBuildName);
-
         if (!currentBuildName) {
             container.innerHTML = `
                 <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
@@ -125,17 +120,12 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             
             let index = await response.json();
             let pages = Array.isArray(index) ? index : Object.values(index);
-            console.log("DEBUG: Total pages loaded from index:", pages.length);
 
             let targetFolder = `minecraft/checklists/builds/${currentBuildName.toLowerCase()}`;
-            console.log("DEBUG: Target Folder Filter:", targetFolder);
-
             let checklists = pages.filter(page => {
                 let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
                 return urlStr.includes(targetFolder) && urlStr.includes("checklist");
             });
-
-            console.log("DEBUG: Filtered Checklists Found:", checklists);
 
             let html = `
             <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
@@ -156,9 +146,21 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             let completedLists = [];
 
             checklists.forEach(item => {
-                let status = (item.frontmatter?.status || item.status || item.data?.status || "").toString().trim().toLowerCase();
-                console.log(`DEBUG: Checklist [${item.title || item.fileSlug}] detected status: "${status}"`, item);
-                if (status === "completed" || status === "complete") {
+                let textContent = item.content || "";
+                
+                // Extract status from text content (e.g. "Status: Completed")
+                let statusMatch = textContent.match(/status[:\s]+([a-zA-Z]+)/i);
+                let status = statusMatch ? statusMatch[1].toLowerCase() : "";
+
+                // Extract progress from text content (e.g. "100.0%")
+                let progressMatch = textContent.match(/(\d+(?:\.\d+)?%)/);
+                let progress = progressMatch ? progressMatch[1] : "0.0%";
+
+                // Attach parsed attributes to item for later use
+                item.parsedStatus = status;
+                item.parsedProgress = progress;
+
+                if (status === "completed" || status === "complete" || progress === "100%" || progress === "100.0%") {
                     completedLists.push(item);
                 } else {
                     activeLists.push(item);
@@ -172,13 +174,12 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                     let rawTitle = item.title || item.fileSlug || "Checklist";
                     let match = rawTitle.match(/^[^-]+-\s*(.*?)\s*Checklist$/i);
                     let projectName = match ? match[1] : rawTitle;
-                    let progress = item.frontmatter?.progress || item.progress || item.data?.progress || '0.0%';
                     let url = item.url || item.permalink || `#`;
                     
                     html += `
                     <div class="callout" data-callout="example" style="margin: 8px 0;">
                         <div class="callout-content" style="padding: 8px 12px;">
-                            <a href="${url}"><strong>${projectName}</strong></a> — 📊 ${progress}
+                            <a href="${url}"><strong>${projectName}</strong></a> — 📊 ${item.parsedProgress}
                         </div>
                     </div>`;
                 });
@@ -194,13 +195,12 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                     let rawTitle = item.title || item.fileSlug || "Checklist";
                     let match = rawTitle.match(/^[^-]+-\s*(.*?)\s*Checklist$/i);
                     let projectName = match ? match[1] : rawTitle;
-                    let progress = item.frontmatter?.progress || item.progress || item.data?.progress || '100.0%';
                     let url = item.url || item.permalink || `#`;
                     
                     html += `
                     <div class="callout" data-callout="example" style="margin: 8px 0;">
                         <div class="callout-content" style="padding: 8px 12px;">
-                            <a href="${url}"><strong>${projectName}</strong></a> — 📊 ${progress}
+                            <a href="${url}"><strong>${projectName}</strong></a> — 📊 ${item.parsedProgress}
                         </div>
                     </div>`;
                 });
@@ -211,7 +211,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             html += `</div></div>`;
             container.innerHTML = html;
         } catch (err) {
-            console.error("DEBUG: Checklist loader crashed:", err);
+            console.error("Checklist loader error:", err);
             container.innerHTML = `
                 <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
                     <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
@@ -219,7 +219,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                         <div class="callout-title-inner">Checklists</div>
                         <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
                     </div>
-                    <div class="callout-content"><p><em>Unable to load checklists (Debug Error).</em></p></div>
+                    <div class="callout-content"><p><em>Unable to load checklists.</em></p></div>
                 </div>`;
         }
     });
