@@ -225,33 +225,17 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     });
     </script>
 
-<!-- LOGS LOADER SCRIPT (Fixed Date Match) -->
+<!-- LOGS LOADER SCRIPT -->
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
-        const logsDebug = [];
-        function logDebug(msg, data = null) {
-            const time = new Date().toISOString().split('T')[1].slice(0, -1);
-            const entry = `[${time}] ${msg}` + (data ? ` ${JSON.stringify(data, null, 2)}` : '');
-            logsDebug.push(entry);
-            console.log(`[LogsDebug]`, msg, data || '');
-        }
-
-        logDebug("Logs loader initialized.");
-
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-            logDebug("Localhost environment detected. Halting logs script.");
-            return;
-        }
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
 
         let container = document.getElementById("vercel-logs-container");
-        logDebug("Container lookup:", { containerFound: !!container, id: "vercel-logs-container" });
         if (!container) return;
 
         let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
-        logDebug("Current build name from <h1>:", { currentBuildName });
 
         function buildCalloutShell(contentHtml) {
-            const debugBox = `<details style="font-size: 11px; opacity: 0.85; margin-top: 12px; border-top: 1px dashed var(--callout-border); padding-top: 6px;"><summary><strong>🛠️ Logs Debug Report (Click to expand)</strong></summary><pre style="white-space: pre-wrap; font-family: monospace; font-size: 10px; margin-top: 6px; max-height: 300px; overflow-y: auto;">${logsDebug.join('\n\n')}</pre></details>`;
             return `
             <div class="callout is-collapsed" data-callout="todo" data-callout-fold="-">
                 <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
@@ -261,19 +245,16 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 </div>
                 <div class="callout-content">
                     ${contentHtml}
-                    ${debugBox}
                 </div>
             </div>`;
         }
 
         if (!currentBuildName) {
-            logDebug("ERROR: Build name empty.");
             container.innerHTML = buildCalloutShell(`<p><em>Could not determine building name.</em></p>`);
             return;
         }
 
         try {
-            logDebug("Fetching search index for logs...");
             let response = await fetch('/contentIndex.json');
             if (!response.ok) {
                 response = await fetch('/searchIndex.json');
@@ -282,10 +263,9 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
             let index = await response.json();
             let pages = Array.isArray(index) ? index : Object.values(index);
-            logDebug("Index loaded successfully.", { totalPages: pages.length });
 
             let matchedLogs = [];
-            pages.forEach((item, indexNum) => {
+            pages.forEach((item) => {
                 let urlStr = (item.url || item.permalink || item.path || "").toLowerCase();
                 let titleStr = (item.title || item.fileSlug || "").toLowerCase();
 
@@ -293,7 +273,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                     let textContent = item.content || "";
                     let title = item.title || item.fileSlug || "Log Entry";
 
-                    // Safely extract YYYY-MM-DD from item.date, title, or content frontmatter
                     let rawDateVal = typeof item.date === 'string' ? item.date : (item.date && item.date.toString ? item.date.toString() : '');
                     let dateMatch = rawDateVal.match(/(\d{4}-\d{2}-\d{2})/)?.[1] || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || "";
                     
@@ -315,14 +294,11 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 }
             });
 
-            logDebug("Total matched logs found:", matchedLogs.length);
-
             if (matchedLogs.length === 0) {
                 container.innerHTML = buildCalloutShell(`<p><em>No logs recorded for this building yet.</em></p>`);
                 return;
             }
 
-            // Sort descending by date and time
             matchedLogs.sort((a, b) => {
                 let dateTimeA = `${a.date} ${a.time || '00:00'}`;
                 let dateTimeB = `${b.date} ${b.time || '00:00'}`;
@@ -331,7 +307,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
             let totalHours = matchedLogs.reduce((sum, log) => sum + log.loggedHours, 0);
 
-            // Clean local date string formatter (avoids GMT object printing)
             function formatDate(dateStr) {
                 if (!dateStr) return '';
                 let parts = dateStr.split('-');
@@ -349,7 +324,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 if (!timeStr) return '';
                 timeStr = timeStr.replace('.', ':').toUpperCase();
                 if (timeStr.includes('AM') || timeStr.includes('PM')) {
-                    // Ensure space before AM/PM matches Obsidian
                     return ` at ${timeStr.replace(/([AP]M)/, ' $1')}`;
                 }
                 let parts = timeStr.split(':');
@@ -378,17 +352,15 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 <div class="callout" data-callout="abstract" style="margin: 8px 0;">
                     <div class="callout-title" style="pointer-events: none; min-height: unset; padding: 8px 12px;">
                         <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
-                        <div class="callout-title-inner" style="font-size: 0.9em; font-weight: normal;">
-                            <strong><a href="${log.url}">📄 ${log.category} Log</a></strong> — 📅 ${formattedDate}${formattedTime}${entryHours}
+                        <div class="callout-title-inner" style="font-size: 0.9em; font-weight: normal; pointer-events: auto;">
+                            <a href="${log.url}">📄 ${log.category} Log — 📅 ${formattedDate}${formattedTime}</a>${entryHours}
                         </div>
                     </div>
                 </div>`;
             });
 
             container.innerHTML = buildCalloutShell(htmlContent);
-            logDebug("Logs successfully rendered to DOM.");
         } catch (err) {
-            logDebug("CRITICAL ERROR during logs execution: " + err.message);
             console.error("Logs loader error:", err);
             container.innerHTML = buildCalloutShell(`<p><em>Unable to load logs for this building.</em></p>`);
         }
