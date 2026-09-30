@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T12:47:28.493-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T12:49:52.448-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
 ---
 
 ***
@@ -54,10 +54,7 @@
 > [!success]- Checklists
 > <div style="text-align: center;">
 > 
-> 
-> </div>
-> 
-> 
+> <button class="obsidian-only-toolbox" style="background-color: var(--interactive-accent); color: var(--text-on-accent); border: none; border-radius: 6px; padding: 8px 14px; font-weight: 500; cursor: pointer; width: 100%; font-size: 0.95em;"><span>📋 Create Checklist from Template</span></button>
 
 > [!todo]- Logs
 > <p><span><em>No logs recorded for this building yet.</em></span></p>
@@ -67,7 +64,7 @@
 > [!example]- Linked Structure Files
 > _No .mcstructure files currently imported._
 
-> Last Updated: 09-30-2026 12:47 PM
+> Last Updated: 09-30-2026 12:49 PM
 ---
 <div class="obsidian-only-toolbox">
 
