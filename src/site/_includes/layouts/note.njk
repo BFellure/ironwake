@@ -90,6 +90,77 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     {% include "components/excalidrawScript.njk" %}
 
     {% raw %}
+    <!-- ========================================== -->
+    <!-- COMPANION DEBUG MONITOR (NON-INTRUSIVE)    -->
+    <!-- ========================================== -->
+    <script>
+    (function() {
+        const logs = [];
+        function record(msg, data) {
+            const time = new Date().toISOString().split('T')[1].slice(0, -1);
+            const entry = `[${time}] ${msg}` + (data !== undefined ? ` ${JSON.stringify(data)}` : '');
+            logs.push(entry);
+            console.log("[StandaloneDebugMonitor]", msg, data !== undefined ? data : '');
+        }
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            record("DOM fully loaded. Inspecting environment...");
+            record("Hostname:", window.location.hostname);
+            
+            const container = document.getElementById("vercel-checklists-container");
+            record("Container #vercel-checklists-container found?", !!container);
+
+            const h1 = document.querySelector("h1");
+            record("Heading <h1> found?", !!h1);
+            record("Build name extracted (h1 innerText):", h1 ? h1.innerText.trim() : null);
+
+            // Test fetching indices independently
+            try {
+                record("Testing fetch for /searchIndex.json...");
+                let res = await fetch('/searchIndex.json');
+                record("/searchIndex.json status:", res.status);
+                if (res.ok) {
+                    let json = await res.json();
+                    let arr = Array.isArray(json) ? json : Object.values(json);
+                    record("/searchIndex.json total entries:", arr.length);
+                    
+                    if (h1) {
+                        let buildName = h1.innerText.trim().toLowerCase();
+                        let targetFolder = `minecraft/checklists/builds/${buildName}`;
+                        let matches = arr.filter(p => {
+                            let u = (p.url || p.permalink || p.path || "").toLowerCase();
+                            return u.includes(targetFolder) && u.includes("checklist");
+                        });
+                        record(`Matching checklist pages found for target folder '${targetFolder}':`, matches.length);
+                        if (matches.length === 0 && arr.length > 0) {
+                            record("Sample page URL from index for comparison:", arr[0].url || arr[0].permalink || arr[0].path);
+                        }
+                    }
+                } else {
+                    let res2 = await fetch('/contentIndex.json');
+                    record("/contentIndex.json status:", res2.status);
+                }
+            } catch (err) {
+                record("Fetch test error:", err.message);
+            }
+
+            // Inject a visible debug panel at the bottom of the page if container exists or as floating element
+            setTimeout(() => {
+                const targetBox = document.getElementById("vercel-checklists-container") || document.querySelector("main");
+                if (targetBox && !document.getElementById("standalone-debug-panel")) {
+                    const debugDiv = document.createElement("div");
+                    debugDiv.id = "standalone-debug-panel";
+                    debugDiv.style.cssText = "margin: 20px 0; padding: 12px; background: rgba(0,0,0,0.05); border: 1px solid var(--callout-border, #ccc); border-radius: 6px; font-size: 12px;";
+                    debugDiv.innerHTML = `<details><summary><strong>🛠️ Standalone Checklist Debug Report</strong></summary><pre style="white-space: pre-wrap; margin-top: 8px; font-family: monospace;">${logs.join('\n')}</pre></details>`;
+                    targetBox.appendChild(debugDiv);
+                }
+            }, 1000);
+        });
+    })();
+    </script>
+    {% endraw %}
+
+    {% raw %}
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
@@ -216,7 +287,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
                     <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
                         <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg></div>
-                        <div class="callout-title-inner">Checklists</div>
+                      \t<div class="callout-title-inner">Checklists</div>
                         <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
                     </div>
                     <div class="callout-content"><p><em>Unable to load checklists.</em></p></div>
