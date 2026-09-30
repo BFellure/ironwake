@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T13:09:31.093-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T13:24:52.865-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
 ---
 
 ***
@@ -49,7 +49,6 @@
 
 ## <div style="text-align: center;"><u>Records & Tracking</u></div>
 
-<div class="obsidian-only-toolbox">
 
 <div class="obsidian-only-toolbox">
 
@@ -58,10 +57,120 @@
 > 
 > <button class="obsidian-only-toolbox" style="background-color: var(--interactive-accent); color: var(--text-on-accent); border: none; border-radius: 6px; padding: 8px 14px; font-weight: 500; cursor: pointer; width: 100%; font-size: 0.95em;"><span>📋 Create Checklist from Template</span></button>
 > </div>
-> 
-> <p><span><em>No checklists created for this build yet.</em></span></p>
+>
+> <p><span><blockquote dir="auto">
+<p><strong>🔥 Active Checklists (1)</strong></p>
+</blockquote></span></p><p><span><div data-callout-metadata="" data-callout-fold="" data-callout="example" class="callout node-insert-event"><div class="callout-title" dir="auto"><div class="callout-icon"><svg width="16" height="16"></svg></div><div class="callout-title-inner"><strong><a data-tooltip-position="top" aria-label="Test - Test Checklist" data-href="Test - Test Checklist" href="Test - Test Checklist" class="internal-link" target="_blank" rel="noopener nofollow">Test</a></strong> — 📊 0.0%</div></div></div></span></p><p><span><blockquote dir="auto">
+<hr>
+</blockquote></span></p><p><span><blockquote dir="auto">
+<p><strong>✅ Completed Checklists (0)</strong></p>
+</blockquote></span></p><p><span><blockquote dir="auto">
+<p><em>No completed checklists found.</em></p>
+</blockquote></span></p>
 
 </div>
+
+<div id="dg-checklists-container">
+  <p><em>Loading checklists...</em></p>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const container = document.getElementById("dg-checklists-container");
+  if (!container) return;
+
+  // Extract the build name from the page title (assumes page title matches the build name)
+  const pageTitle = document.title.split('|')[0].trim();
+  
+  try {
+    // Fetch the Digital Garden search/metadata index
+    const response = await fetch('/index.json');
+    if (!response.ok) throw new Error("Could not load index");
+    const pages = await response.json();
+
+    // Filter pages that match your checklist folder structure
+    const targetPathPrefix = `minecraft/checklists/builds/${pageTitle.toLowerCase()}`;
+    
+    const checklists = pages.filter(p => {
+      const slug = (p.slug || p.path || '').toLowerCase();
+      return slug.includes(targetPathPrefix);
+    });
+
+    if (checklists.length === 0) {
+      container.innerHTML = "<p><em>No checklists created for this build yet.</em></p>";
+      return;
+    }
+
+    // Separate active and completed checklists
+    let activeLists = [];
+    let completedLists = [];
+
+    checklists.forEach(item => {
+      const status = item.frontmatter?.status ? item.frontmatter.status.toLowerCase() : '';
+      if (status === 'completed') {
+        completedLists.push(item);
+      } else {
+        activeLists.push(item);
+      }
+    });
+
+    // Sort by creation date (newest first)
+    const sortByDate = (a, b) => {
+      const dateA = a.frontmatter?.created || '1970-01-01';
+      const dateB = b.frontmatter?.created || '1970-01-01';
+      return new Date(dateB) - new Date(dateA);
+    };
+    activeLists.sort(sortByDate);
+    completedLists.sort(sortByDate);
+
+    let html = '';
+
+    // Render Active Checklists
+    html += `<div style="margin-bottom: 12px; font-weight: 600;">🔥 Active Checklists (${activeLists.length})</div>`;
+    if (activeLists.length > 0) {
+      activeLists.forEach(item => {
+        const fileName = item.title || item.slug.split('/').pop();
+        const match = fileName.match(/^[^-]+-\s*(.*?)\s*Checklist$/i);
+        const projectName = match ? match[1] : fileName;
+        const progress = item.frontmatter?.progress || '0.0%';
+        const url = '/' + item.slug;
+
+        html += `<div style="margin: 6px 0; padding: 8px 12px; background: var(--background-secondary, #f4f4f5); border-radius: 6px; border-left: 4px solid var(--interactive-accent, #3b82f6);">
+          <a href="${url}" style="text-decoration: none; font-weight: 600; color: inherit;">${projectName}</a> — 📊 ${progress}
+        </div>`;
+      });
+    } else {
+      html += `<p style="color: var(--text-muted, #71717a); font-style: italic;">No active checklists found.</p>`;
+    }
+
+    html += `<hr style="margin: 16px 0; border: none; border-top: 1px solid var(--background-modifier-border, #e4e4e7);" />`;
+
+    // Render Completed Checklists
+    html += `<div style="margin-bottom: 12px; font-weight: 600;">✅ Completed Checklists (${completedLists.length})</div>`;
+    if (completedLists.length > 0) {
+      completedLists.forEach(item => {
+        const fileName = item.title || item.slug.split('/').pop();
+        const match = fileName.match(/^[^-]+-\s*(.*?)\s*Checklist$/i);
+        const projectName = match ? match[1] : fileName;
+        const progress = item.frontmatter?.progress || '100.0%';
+        const url = '/' + item.slug;
+
+        html += `<div style="margin: 6px 0; padding: 8px 12px; background: var(--background-secondary, #f4f4f5); border-radius: 6px; border-left: 4px solid #10b981;">
+          <a href="${url}" style="text-decoration: none; font-weight: 600; color: inherit;">${projectName}</a> — 📊 ${progress}
+        </div>`;
+      });
+    } else {
+      html += `<p style="color: var(--text-muted, #71717a); font-style: italic;">No completed checklists found.</p>`;
+    }
+
+    container.innerHTML = html;
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p><em>Error loading checklists.</em></p>";
+  }
+});
+</script>
 
 > [!todo]- Logs
 > <p><span><em>No logs recorded for this building yet.</em></span></p>
@@ -71,7 +180,7 @@
 > [!example]- Linked Structure Files
 > _No .mcstructure files currently imported._
 
-> Last Updated: 09-30-2026 01:09 PM
+> Last Updated: 09-30-2026 01:24 PM
 ---
 <div class="obsidian-only-toolbox">
 
