@@ -89,34 +89,16 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     {% include "components/basesScript.njk" %}
     {% include "components/excalidrawScript.njk" %}
 
-   {% raw %}
+    {% raw %}
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
-        // --- Debug Log Reporter ---
-        const debugLogs = [];
-        function logDebug(message, data = null) {
-            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-            const logEntry = `[${timestamp}] ${message}` + (data ? ` ${JSON.stringify(data)}` : '');
-            debugLogs.push(logEntry);
-            console.log(`[ChecklistDebug]`, message, data || '');
-        }
-
-        logDebug("DOMContentLoaded fired. Initializing script.");
-
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-            logDebug("Localhost environment detected. Aborting execution.");
-            return;
-        }
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
 
         let container = document.getElementById("vercel-checklists-container");
-        logDebug("Container element lookup result:", { found: !!container, id: "vercel-checklists-container" });
         if (!container) return;
 
         let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
-        logDebug("Extracted current build name from <h1>:", { currentBuildName });
-
         if (!currentBuildName) {
-            logDebug("Build name could not be determined. Rendering error callout.");
             container.innerHTML = `
                 <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
                     <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
@@ -130,26 +112,20 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         }
 
         try {
-            logDebug("Fetching search index from /searchIndex.json");
             let response = await fetch('/searchIndex.json');
             if (!response.ok) {
-                logDebug("searchIndex.json failed with status " + response.status + ". Falling back to /contentIndex.json");
                 response = await fetch('/contentIndex.json');
             }
             if (!response.ok) throw new Error("Could not find site search index JSON.");
             
             let index = await response.json();
             let pages = Array.isArray(index) ? index : Object.values(index);
-            logDebug("Search index loaded successfully.", { totalPages: pages.length });
 
             let targetFolder = `minecraft/checklists/builds/${currentBuildName.toLowerCase()}`;
-            logDebug("Target folder constructed:", { targetFolder });
-
             let checklists = pages.filter(page => {
                 let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
                 return urlStr.includes(targetFolder) && urlStr.includes("checklist");
             });
-            logDebug("Filtered checklists matching target folder and keyword:", { matchedCount: checklists.length });
 
             let html = `
             <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
@@ -161,13 +137,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 <div class="callout-content">`;
 
             if (checklists.length === 0) {
-                logDebug("No checklists found for this build. Appending empty state message.");
                 html += `<p><em>No checklists created for this build yet.</em></p></div></div>`;
-                
-                // Append Debug Section to content
-                html += `<hr style="border: none; border-top: 1px dashed var(--callout-border); margin: 12px 0;">
-                         <details style="font-size: 11px; opacity: 0.8;"><summary><strong>🛠️ Checklist Debug Report</strong></summary><pre style="white-space: pre-wrap; margin-top: 6px;">${debugLogs.join('\n')}</pre></details>`;
-                
                 container.innerHTML = html;
                 return;
             }
@@ -196,8 +166,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                     activeLists.push(item);
                 }
             });
-
-            logDebug("Checklists categorized.", { activeCount: activeLists.length, completedCount: completedLists.length });
 
             html += `<p><strong>🔥 Active Checklists (${activeLists.length})</strong></p>`;
             
@@ -240,17 +208,10 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 html += `<p><em>No completed checklists found.</em></p>`;
             }
 
-            // Append Debug Report section inside the collapsible callout
-            logDebug("Rendering complete HTML structure with debug logs report.");
-            html += `<hr style="border: none; border-top: 1px dashed var(--callout-border); margin: 12px 0;">
-                     <details style="font-size: 11px; opacity: 0.8;"><summary><strong>🛠️ Checklist Debug Report</strong></summary><pre style="white-space: pre-wrap; margin-top: 6px;">${debugLogs.join('\n')}</pre></details>`;
-
             html += `</div></div>`;
             container.innerHTML = html;
         } catch (err) {
             console.error("Checklist loader error:", err);
-            logDebug("CRITICAL ERROR caught during execution: " + err.message);
-            
             container.innerHTML = `
                 <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
                     <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
@@ -258,15 +219,11 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                         <div class="callout-title-inner">Checklists</div>
                         <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
                     </div>
-                    <div class="callout-content">
-                        <p><em>Unable to load checklists.</em></p>
-                        <hr style="border: none; border-top: 1px dashed var(--callout-border); margin: 12px 0;">
-                        <details style="font-size: 11px; opacity: 0.8;"><summary><strong>🛠️ Checklist Debug Report (Error State)</strong></summary><pre style="white-space: pre-wrap; margin-top: 6px;">${debugLogs.join('\n')}</pre></details>
-                    </div>
+                    <div class="callout-content"><p><em>Unable to load checklists.</em></p></div>
                 </div>`;
         }
     });
     </script>
-{% endraw %}
+    {% endraw %}
   </body>
 </html>
