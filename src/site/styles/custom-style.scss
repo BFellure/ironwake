@@ -6,6 +6,9 @@
 /* Hide elements tagged with obsidian-only-toolbox across all web views */
 .obsidian-only-toolbox {
     display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
 }
 
 /* Optional: If Digital Garden renders raw dataviewjs code blocks or 
