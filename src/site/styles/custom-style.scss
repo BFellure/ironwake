@@ -1,11 +1,13 @@
-body {
-    /***
-     ADD YOUR CUSTOM STYLING HERE. (INSIDE THE body {...} section.)
-     IT WILL TAKE PRECEDENCE OVER THE STYLING IN THE STYLE.CSS FILE.
-    ***/
-}
+/***
+  ADD YOUR CUSTOM STYLING HERE. 
+  IT WILL TAKE PRECEDENCE OVER THE STYLING IN THE STYLE.CSS FILE.
+***/
 
-/* Move this to the root level so it reliably hides across all web views */
+/* Hide elements tagged with obsidian-only-toolbox across all web views */
 .obsidian-only-toolbox {
     display: none !important;
 }
+
+/* Optional: If Digital Garden renders raw dataviewjs code blocks or 
+   fallback containers that don't pick up the class cleanly on build, 
+   you can target specific comment blocks or containers if needed. */
