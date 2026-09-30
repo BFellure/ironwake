@@ -113,14 +113,14 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             let index = await response.json();
             let pages = Array.isArray(index) ? index : Object.values(index);
 
-            let targetFolder = `minecraft/checklists/${currentBuildName.toLowerCase()}`;
+            let targetFolder = `minecraft/checklists/builds/${currentBuildName.toLowerCase()}`;
             let checklists = pages.filter(page => {
                 let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
                 return urlStr.includes(targetFolder) && urlStr.includes("checklist");
             });
 
             if (checklists.length === 0) {
-                container.innerHTML = `<p><em>No checklists found under Minecraft/Checklists/${currentBuildName}/.</em></p>`;
+                container.innerHTML = `<p><em>No checklists found under Minecraft/Checklists/Builds/${currentBuildName}/.</em></p>`;
                 return;
             }
 
