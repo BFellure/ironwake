@@ -225,7 +225,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     });
     </script>
 
-   <!-- LOGS LOADER SCRIPT WITH ENHANCED DEBUGGING -->
+  <!-- LOGS LOADER SCRIPT (Using ContentIndex for Frontmatter) -->
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const logsDebug = [];
@@ -273,16 +273,18 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         }
 
         try {
-            logDebug("Fetching search index for logs...");
-            let response = await fetch('/searchIndex.json');
+            // Try fetching contentIndex.json first as it contains full frontmatter
+            logDebug("Fetching contentIndex.json for frontmatter access...");
+            let response = await fetch('/contentIndex.json');
             if (!response.ok) {
-                response = await fetch('/contentIndex.json');
+                logDebug("contentIndex.json not found, falling back to searchIndex.json...");
+                response = await fetch('/searchIndex.json');
             }
-            if (!response.ok) throw new Error("Could not fetch site search index JSON.");
+            if (!response.ok) throw new Error("Could not fetch site index JSON.");
 
             let index = await response.json();
             let pages = Array.isArray(index) ? index : Object.values(index);
-            logDebug("Search index loaded successfully.", { totalPages: pages.length });
+            logDebug("Index loaded successfully.", { totalPages: pages.length });
 
             let targetFolderFragment = `logs/building&region logs/${currentBuildName.toLowerCase()} logs/`;
             logDebug("Target folder search fragment:", { targetFolderFragment });
@@ -293,26 +295,27 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 let titleStr = (item.title || item.fileSlug || "").toLowerCase();
 
                 if (urlStr.includes(targetFolderFragment) || (urlStr.includes("logs/") && urlStr.includes(currentBuildName.toLowerCase()))) {
+                    // Check frontmatter locations: item.frontmatter, item.data, or direct item properties
+                    let fm = item.frontmatter || item.data || item;
+
                     logDebug(`--- Matched Page #${indexNum} ---`, {
                         title: item.title,
                         url: urlStr,
-                        allItemKeys: Object.keys(item),
-                        hasDataObj: !!item.data,
-                        dataKeys: item.data ? Object.keys(item.data) : null
+                        keys: Object.keys(item),
+                        fmKeys: Object.keys(fm)
                     });
 
                     let textContent = item.content || "";
-                    let dataObj = item.data || item; 
 
-                    let dateMatch = dataObj.date || item.date || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || "";
-                    let timeMatch = dataObj.time || item.time || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
+                    let dateMatch = fm.date || item.date || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || "";
+                    let timeMatch = fm.time || item.time || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
                     
-                    // Inspect various ways logged-hours could be named or stored
-                    let rawHours = dataObj['logged-hours'] || dataObj.loggedHours || item['logged-hours'] || item.loggedHours;
+                    // Retrieve logged-hours from frontmatter variations
+                    let rawHours = fm['logged-hours'] || fm.loggedHours || item['logged-hours'] || item.loggedHours;
+                    
                     logDebug(`Hours inspection for "${item.title || item.fileSlug}":`, {
-                        "dataObj['logged-hours']": dataObj['logged-hours'],
-                        "dataObj.loggedHours": dataObj.loggedHours,
-                        "item['logged-hours']": item['logged-hours'],
+                        "fm['logged-hours']": fm['logged-hours'],
+                        "fm.loggedHours": fm.loggedHours,
                         "resolvedRawHours": rawHours
                     });
 
@@ -322,7 +325,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                         logDebug(`Regex fallback hours parsed from content:`, rawHours);
                     }
 
-                    let categoryMatch = dataObj.category || item.category || (textContent.match(/category[:\s]+["']?([^\r\n"']+)["']?/i) || [])[1] || "Building";
+                    let categoryMatch = fm.category || item.category || (textContent.match(/category[:\s]+["']?([^\r\n"']+)["']?/i) || [])[1] || "Building";
 
                     let parsedHours = parseFloat(rawHours) || 0;
                     logDebug(`Final parsed hours for this log: ${parsedHours}`);
