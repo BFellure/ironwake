@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T14:40:05.796-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T14:55:58.930-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
 ---
 
 ***
@@ -49,6 +49,49 @@
 
 ## <div style="text-align: center;"><u>Records & Tracking</u></div>
 
+<div id="public-checklists-container" style="background-color: var(--background-secondary); border: 1px solid var(--background-modifier-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;">
+    <div style="font-weight: 600; margin-bottom: 10px; color: var(--text-normal);">🔥 Published Checklists</div>
+    <div id="checklist-results">Loading checklists...</div>
+</div>
+
+<script>
+(async () => {
+    try {
+        // Option: Fetch from a static JSON manifest of your vault data if you generate one, 
+        // or query the GitHub API directly for your published checklist folder:
+        let response = await fetch('https://api.github.com/repos/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/contents/Minecraft/Checklists/Builds/' + encodeURIComponent(window.location.pathname.split('/').pop()));
+        
+        if (!response.ok) throw new Error("Could not fetch checklists.");
+        
+        let files = await response.json();
+        let container = document.getElementById('checklist-results');
+        container.innerHTML = "";
+        
+        if (Array.isArray(files) && files.length > 0) {
+            let ul = document.createElement('ul');
+            ul.style.css = "margin: 0; padding-left: 20px;";
+            
+            for (let file of files) {
+                if (file.name.endsWith('.md')) {
+                    let li = document.createElement('li');
+                    let a = document.createElement('a');
+                    a.href = `/${file.path.replace('.md', '')}`;
+                    a.textContent = file.name.replace('.md', '');
+                    a.className = "internal-link";
+                    li.appendChild(a);
+                    ul.appendChild(li);
+                }
+            }
+            container.appendChild(ul);
+        } else {
+            container.innerHTML = "<em>No checklists found for this build.</em>";
+        }
+    } catch (err) {
+        document.getElementById('checklist-results').innerHTML = "<em>Unable to load live checklists.</em>";
+    }
+})();
+</script>
+
 
 
 
@@ -57,7 +100,7 @@
 > [!example]- Linked Structure Files
 > _No .mcstructure files currently imported._
 
-> Last Updated: 09-30-2026 02:40 PM
+> Last Updated: 09-30-2026 02:55 PM
 ---
 <div class="obsidian-only-toolbox">
 
