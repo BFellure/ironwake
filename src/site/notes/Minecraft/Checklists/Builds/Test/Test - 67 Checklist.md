@@ -10,7 +10,7 @@
 > [!info] Project Status
 > **Status:** Active
 >  
-> <p><span><div align="center"><b>Progress</b><br><div style="background: rgba(150,150,150,0.2); border-radius: 4px; height: 8px; width: 250px; margin: 6px auto; overflow: hidden; display: flex;"><div style="background: var(--interactive-accent); width: 0.0%; height: 100%;"></div></div>0.0%</div></span></p>
+> <p><span><div align="center"><b>Progress</b><br><div style="background: rgba(150,150,150,0.2); border-radius: 4px; height: 8px; width: 250px; margin: 6px auto; overflow: hidden; display: flex;"><div style="background: var(--interactive-accent); width: 83.3%; height: 100%;"></div></div>83.3%</div></span></p>
 
 ---
 
