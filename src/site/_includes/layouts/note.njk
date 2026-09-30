@@ -225,7 +225,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     });
     </script>
 
-    <!-- LOGS LOADER SCRIPT (Matches by Note Name folder path & filename structure) -->
+   <!-- LOGS LOADER SCRIPT -->
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const logsDebug = [];
@@ -251,7 +251,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         logDebug("Current build name from <h1>:", { currentBuildName });
 
         function buildCalloutShell(contentHtml) {
-            const debugBox = `<details style="font-size: 11px; opacity: 0.85; margin-top: 12px; border-top: 1px dashed var(--callout-border); padding-top: 6px;"><summary><strong>🛠️ Logs Debug Report</strong></summary><pre style="white-space: pre-wrap; font-family: monospace; font-size: 10px; margin-top: 6px;">${logsDebug.join('\n')}</pre></details>`;
+            const debugBox = `<details style="font-size: 11px; opacity: 0.85; margin-top: 12px; border-top: 1px dashed var(--callout-border); padding-top: 6px;"><summary><strong>🛠️️ Logs Debug Report</strong></summary><pre style="white-space: pre-wrap; font-family: monospace; font-size: 10px; margin-top: 6px;">${logsDebug.join('\n')}</pre></details>`;
             return `
             <div class="callout is-collapsed" data-callout="todo" data-callout-fold="-">
                 <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
@@ -292,28 +292,35 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 let urlStr = (item.url || item.permalink || item.path || "").toLowerCase();
                 let titleStr = (item.title || item.fileSlug || "").toLowerCase();
 
-                // Check if page lives in this note's specific log folder path or has the building name in path
                 if (urlStr.includes(targetFolderFragment) || (urlStr.includes("logs/") && urlStr.includes(currentBuildName.toLowerCase()))) {
                     let textContent = item.content || "";
+                    let dataObj = item.data || item; // Check nested frontmatter data object or root item
 
-                    // Extract frontmatter properties if available, fallback to regex parsing from content or filename
-                    let dateMatch = item.date || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || "";
-                    let timeMatch = item.time || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
-                    let hoursMatch = item['logged-hours'] || item.loggedHours || (textContent.match(/logged-hours[:\s]+([\d\.]+)/i) || [])[1] || 0;
-                    let categoryMatch = item.category || (textContent.match(/category[:\s]+["']?([^\r\n"']+)["']?/i) || [])[1] || "Building";
+                    // Extract fields robustly from frontmatter object or content text regex
+                    let dateMatch = dataObj.date || item.date || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || "";
+                    let timeMatch = dataObj.time || item.time || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
+                    
+                    // Look for logged-hours in data, item properties, or scan the raw text/content for "logged-hours: X"
+                    let rawHours = dataObj['logged-hours'] || dataObj.loggedHours || item['logged-hours'] || item.loggedHours;
+                    if (rawHours === undefined || rawHours === null) {
+                        let hoursReg = textContent.match(/logged-hours[:\s]+([\d\.]+)/i);
+                        rawHours = hoursReg ? hoursReg[1] : 0;
+                    }
+
+                    let categoryMatch = dataObj.category || item.category || (textContent.match(/category[:\s]+["']?([^\r\n"']+)["']?/i) || [])[1] || "Building";
 
                     matchedLogs.push({
                         title: item.title || item.fileSlug || "Log Entry",
                         url: item.url || item.permalink || "#",
                         date: dateMatch.trim(),
                         time: timeMatch.trim(),
-                        loggedHours: parseFloat(hoursMatch) || 0,
+                        loggedHours: parseFloat(rawHours) || 0,
                         category: categoryMatch.trim()
                     });
                 }
             });
 
-            logDebug("Matched logs found:", { matchedCount: matchedLogs.length });
+            logDebug("Matched logs found:", { count: matchedLogs.length, sample: matchedLogs[0] });
 
             if (matchedLogs.length === 0) {
                 container.innerHTML = buildCalloutShell(`<p><em>No logs recorded for this building yet.</em></p>`);
