@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T15:01:09.460-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T15:07:55.888-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":[],"structures":[],"tags":["builds"]}}
 ---
 
 ***
@@ -49,63 +49,8 @@
 
 ## <div style="text-align: center;"><u>Records & Tracking</u></div>
 
-<div id="public-checklists-container" style="background-color: var(--background-secondary); border: 1px solid var(--background-modifier-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;">
-    <div style="font-weight: 600; margin-bottom: 10px; color: var(--text-normal);">🔥 Published Checklists</div>
-    <div id="checklist-results">Loading checklists...</div>
-</div>
 
-<script>
-(async () => {
-    let container = document.getElementById('checklist-results');
-    try {
-        // Fetch the site's json index which contains all published metadata
-        let response = await fetch('/index.json').catch(() => fetch('/static/searchIndex.json'));
-        if (!response.ok) throw new Error("Index fetch failed");
-        
-        let data = await response.json();
-        container.innerHTML = "";
-        
-        // Get the current build slug from the URL path (e.g., "test" from /Minecraft/Builds/Test)
-        let pathSegments = window.location.pathname.split('/').filter(Boolean);
-        let currentBuild = pathSegments[pathSegments.length - 1] || "";
-        
-        // Normalize the JSON data structure depending on Quartz/DG version
-        let notes = Array.isArray(data) ? data : (data.notes || data.results || Object.values(data));
-        let matchedChecklists = [];
-
-        for (let note of notes) {
-            let url = note.url || note.slug || note.path || "";
-            let title = note.title || url.split('/').pop().replace(/-/g, ' ');
-            
-            // Check if this note is inside the checklists path and matches the current build name
-            if (url.toLowerCase().includes("minecraft/checklists/builds") && url.toLowerCase().includes(currentBuild.toLowerCase())) {
-                matchedChecklists.push({ title: title, url: "/" + url.replace(/^\/+/, '') });
-            }
-        }
-
-        if (matchedChecklists.length > 0) {
-            let ul = document.createElement('ul');
-            ul.style.cssText = "margin: 0; padding-left: 20px;";
-            for (let item of matchedChecklists) {
-                let li = document.createElement('li');
-                let a = document.createElement('a');
-                a.href = item.url;
-                a.textContent = item.title;
-                a.className = "internal-link";
-                li.appendChild(a);
-                ul.appendChild(li);
-            }
-            container.appendChild(ul);
-        } else {
-            container.innerHTML = "<em>No active checklists found for this build.</em>";
-        }
-    } catch (err) {
-        container.innerHTML = "<em>Unable to load checklists.</em>";
-    }
-})();
-</script>
-
-
+<div id="vercel-checklists-container">Loading public checklists...</div>
 
 
 
@@ -113,7 +58,7 @@
 > [!example]- Linked Structure Files
 > _No .mcstructure files currently imported._
 
-> Last Updated: 09-30-2026 03:01 PM
+> Last Updated: 09-30-2026 03:07 PM
 ---
 <div class="obsidian-only-toolbox">
 
