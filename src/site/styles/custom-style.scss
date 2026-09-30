@@ -1,16 +1,11 @@
-/***
-  ADD YOUR CUSTOM STYLING HERE. 
-  IT WILL TAKE PRECEDENCE OVER THE STYLING IN THE STYLE.CSS FILE.
-***/
-
-/* Hide elements tagged with obsidian-only-toolbox across all web views */
-.obsidian-only-toolbox {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    overflow: hidden !important;
+body {
+    /***
+     ADD YOUR CUSTOM STYLING HERE. (INSIDE THE body {...} section.)
+     IT WILL TAKE PRECEDENCE OVER THE STYLING IN THE STYLE.CSS FILE.
+    ***/
 }
 
-/* Optional: If Digital Garden renders raw dataviewjs code blocks or 
-   fallback containers that don't pick up the class cleanly on build, 
-   you can target specific comment blocks or containers if needed. */
+/* Hide elements with this class completely on the Digital Garden / Vercel site */
+.obsidian-only-toolbox {
+    display: none !important;
+}
