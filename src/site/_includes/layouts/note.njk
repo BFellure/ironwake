@@ -91,6 +91,138 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
 
    {% raw %}
     <script>
+    // --- Working Checklists Loader Script ---
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
+
+        let container = document.getElementById("vercel-checklists-container");
+        if (!container) return;
+
+        let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
+        if (!currentBuildName) {
+            container.innerHTML = `
+                <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
+                    <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
+                        <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg></div>
+                        <div class="callout-title-inner">Checklists</div>
+                        <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                    </div>
+                    <div class="callout-content"><p><em>Could not determine build name.</em></p></div>
+                </div>`;
+            return;
+        }
+
+        try {
+            let response = await fetch('/searchIndex.json');
+            if (!response.ok) {
+                response = await fetch('/contentIndex.json');
+            }
+            if (!response.ok) throw new Error("Could not find site search index JSON.");
+            
+            let index = await response.json();
+            let pages = Array.isArray(index) ? index : Object.values(index);
+
+            let targetFolder = `minecraft/checklists/builds/${currentBuildName.toLowerCase()}`;
+            let checklists = pages.filter(page => {
+                let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
+                return urlStr.includes(targetFolder) && urlStr.includes("checklist");
+            });
+
+            let html = `
+            <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
+                <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
+                    <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg></div>
+                    <div class="callout-title-inner">Checklists</div>
+                    <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                </div>
+                <div class="callout-content">`;
+
+            if (checklists.length === 0) {
+                html += `<p><em>No checklists created for this build yet.</em></p></div></div>`;
+                container.innerHTML = html;
+                return;
+            }
+
+            let activeLists = [];
+            let completedLists = [];
+
+            checklists.forEach(item => {
+                let textContent = item.content || "";
+                
+                let statusMatch = textContent.match(/status[:\s]+([a-zA-Z]+)/i);
+                let status = statusMatch ? statusMatch[1].toLowerCase() : "";
+
+                let progressMatch = textContent.match(/(\d+(?:\.\d+)?%)/);
+                let progress = progressMatch ? progressMatch[1] : "0.0%";
+
+                item.parsedStatus = status;
+                item.parsedProgress = progress;
+
+                if (status === "completed" || status === "complete" || progress === "100%" || progress === "100.0%") {
+                    completedLists.push(item);
+                } else {
+                    activeLists.push(item);
+                }
+            });
+
+            html += `<p><strong>🔥 Active Checklists (${activeLists.length})</strong></p>`;
+            
+            if (activeLists.length > 0) {
+                activeLists.forEach(item => {
+                    let rawTitle = item.title || item.fileSlug || "Checklist";
+                    let match = rawTitle.match(/^[^-]+-\s*(.*?)\s*Checklist$/i);
+                    let projectName = match ? match[1] : rawTitle;
+                    let url = item.url || item.permalink || `#`;
+                    
+                    html += `
+                    <div class="callout" data-callout="example" style="margin: 8px 0;">
+                        <div class="callout-content" style="padding: 8px 12px;">
+                            <a href="${url}"><strong>${projectName}</strong></a> — 📊 ${item.parsedProgress}
+                        </div>
+                    </div>`;
+                });
+            } else {
+                html += `<p><em>No active checklists found.</em></p>`;
+            }
+
+            html += `<hr style="border: none; border-top: 1px solid var(--callout-border); margin: 12px 0;">`;
+
+            html += `<p><strong>✅ Completed Checklists (${completedLists.length})</strong></p>`;
+            if (completedLists.length > 0) {
+                completedLists.forEach(item => {
+                    let rawTitle = item.title || item.fileSlug || "Checklist";
+                    let match = rawTitle.match(/^[^-]+-\s*(.*?)\s*Checklist$/i);
+                    let projectName = match ? match[1] : rawTitle;
+                    let url = item.url || item.permalink || `#`;
+                    
+                    html += `
+                    <div class="callout" data-callout="example" style="margin: 8px 0;">
+                        <div class="callout-content" style="padding: 8px 12px;">
+                            <a href="${url}"><strong>${projectName}</strong></a> — 📊 ${item.parsedProgress}
+                        </div>
+                    </div>`;
+                });
+            } else {
+                html += `<p><em>No completed checklists found.</em></p>`;
+            }
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+        } catch (err) {
+            console.error("Checklist loader error:", err);
+            container.innerHTML = `
+                <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
+                    <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
+                        <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg></div>
+                        <div class="callout-title-inner">Checklists</div>
+                        <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                    </div>
+                    <div class="callout-content"><p><em>Unable to load checklists.</em></p></div>
+                </div>`;
+        }
+    });
+
+    // --- Logs Loader Script Matching Layout ---
     document.addEventListener("DOMContentLoaded", async () => {
         if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
 
@@ -121,9 +253,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             let index = await response.json();
             let pages = Array.isArray(index) ? index : Object.values(index);
 
-            // Matches: minecraft/logs/building&region logs/[note name] logs/
             let targetFolder = `minecraft/logs/building&region logs/${currentBuildName.toLowerCase()} logs`;
-            
             let logs = pages.filter(page => {
                 let urlStr = (page.url || page.permalink || page.path || "").toLowerCase();
                 return urlStr.includes(targetFolder);
@@ -152,7 +282,9 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                     <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
                 </div>
                 <div class="callout-content">
-                    <p><strong>⏱️ Total Time Invested: ${totalHours.toFixed(1)} hrs (${logs.length} log${logs.length === 1 ? '' : 's'})</strong></p>`;
+                    <div style="border-left: 3px solid var(--callout-border); padding-left: 12px; margin-bottom: 12px;">
+                        <p><strong>⏱️ Total Time Invested: ${totalHours.toFixed(1)} hrs (${logs.length} log${logs.length === 1 ? '' : 's'})</strong></p>
+                    </div>`;
 
             if (logs.length === 0) {
                 html += `<p><em>No logs recorded for this note yet.</em></p></div></div>`;
@@ -170,7 +302,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 let categoryMatch = textContent.match(/category[:\s]+([a-zA-Z]+)/i);
                 let category = categoryMatch ? categoryMatch[1] : "Building";
 
-                // Parse date if available in fileSlug or frontmatter, fallback to current formatting style
                 let rawDate = item.date ? new Date(item.date) : new Date();
                 let dateFormatted = !isNaN(rawDate) ? rawDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' at ' + rawDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : "Recent";
 
