@@ -88,5 +88,72 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     {% endif %}
     {% include "components/basesScript.njk" %}
     {% include "components/excalidrawScript.njk" %}
+
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") return;
+
+        let container = document.getElementById("vercel-checklists-container");
+        if (!container) return;
+
+        let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
+        if (!currentBuildName) {
+            container.innerHTML = "<p><em>Could not determine build name for checklists.</em></p>";
+            return;
+        }
+
+        try {
+            let response = await fetch('/contentIndex.json');
+            let index = await response.json();
+            
+            let pages = Array.isArray(index) ? index : Object.values(index);
+            let checklists = pages.filter(page => {
+                return (page.url && page.url.includes(`Minecraft/Checklists/Builds/${currentBuildName}`)) || 
+                       (page.path && page.path.includes(`Minecraft/Checklists/Builds/${currentBuildName}`));
+            });
+
+            if (checklists.length === 0) {
+                container.innerHTML = "<p><em>No checklists created for this build yet.</em></p>";
+                return;
+            }
+
+            let activeLists = checklists.filter(p => !p.frontmatter?.status || p.frontmatter.status.toLowerCase() !== 'completed');
+            let completedLists = checklists.filter(p => p.frontmatter?.status && p.frontmatter.status.toLowerCase() === 'completed');
+
+            let html = `<div class="vercel-checklist-box">`;
+            
+            html += `<strong>🔥 Active Checklists (${activeLists.length})</strong><ul>`;
+            if (activeLists.length > 0) {
+                activeLists.forEach(item => {
+                    let title = item.title || item.fileSlug || "Checklist";
+                    let progress = item.frontmatter?.progress || '0.0%';
+                    let url = item.url || `#`;
+                    html += `<li><a href="${url}">${title}</a> — 📊 ${progress}</li>`;
+                });
+            } else {
+                html += `<li><em>No active checklists.</em></li>`;
+            }
+            html += `</ul><hr>`;
+
+            html += `<strong>✅ Completed Checklists (${completedLists.length})</strong><ul>`;
+            if (completedLists.length > 0) {
+                completedLists.forEach(item => {
+                    let title = item.title || item.fileSlug || "Checklist";
+                    let progress = item.frontmatter?.progress || '100.0%';
+                    let url = item.url || `#`;
+                    html += `<li><a href="${url}">${title}</a> — 📊 ${progress}</li>`;
+                });
+            } else {
+                html += `<li><em>No completed checklists.</em></li>`;
+            }
+            html += `</ul></div>`;
+
+            container.innerHTML = html;
+        } catch (err) {
+            console.error("Failed to load checklists from contentIndex:", err);
+            container.innerHTML = "<p><em>Error loading checklists.</em></p>";
+        }
+    });
+    </script>
   </body>
 </html>
