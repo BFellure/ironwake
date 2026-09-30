@@ -225,7 +225,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
     });
     </script>
 
- <!-- LOGS LOADER SCRIPT (Extracts hours from content text) -->
+ <!-- LOGS LOADER SCRIPT (Dataview Format Match) -->
     <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const logsDebug = [];
@@ -293,25 +293,13 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                     let textContent = item.content || "";
                     let title = item.title || item.fileSlug || "Log Entry";
 
-                    // Extract Date (from item.date or title or content)
                     let dateMatch = item.date || (titleStr.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || (textContent.match(/date[:\s]+["']?([\d\-]+)["']?/i) || [])[1] || "";
-                    
-                    // Extract Time from title string (e.g. "4.04PM" or "3:57 PM") or content
                     let timeMatch = (titleStr.match(/(\d{1,2}[.:]\d{2}\s*(?:AM|PM))/i) || [])[1] || (textContent.match(/time[:\s]+["']?([\d:]+\s*(?:AM|PM)?)["']?/i) || [])[1] || "";
 
-                    // Extract hours from text content body matching formats like (*22.0 hrs*) or 22.0 hrs
                     let hoursMatch = textContent.match(/\(\*?\s*([\d\.]+)\s*hrs\s*\*?\)/i) || textContent.match(/([\d\.]+)\s*hrs/i);
                     let parsedHours = hoursMatch ? parseFloat(hoursMatch[1]) : 0;
 
-                    // Determine category from title or content
                     let categoryMatch = titleStr.includes("building log") ? "Building" : "Region";
-
-                    logDebug(`Parsed Log #${indexNum}:`, {
-                        title: title,
-                        date: dateMatch,
-                        time: timeMatch,
-                        parsedHours: parsedHours
-                    });
 
                     matchedLogs.push({
                         title: title,
@@ -339,7 +327,6 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
             });
 
             let totalHours = matchedLogs.reduce((sum, log) => sum + log.loggedHours, 0);
-            logDebug(`Calculated totalHours sum: ${totalHours}`);
 
             function formatDate(dateStr) {
                 if (!dateStr) return '';
@@ -355,6 +342,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 return ` at ${timeStr}`;
             }
 
+            // Exact match to dv.paragraph formatting
             let htmlContent = `
             <p><small>⏱️ <strong>Total Time Invested:</strong> ${totalHours.toFixed(1)} hrs (${matchedLogs.length} logs)</small></p>
             <hr style="border: none; border-top: 1px solid var(--callout-border); margin: 8px 0;">`;
@@ -367,7 +355,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 htmlContent += `
                 <div class="callout" data-callout="example" style="margin: 8px 0;">
                     <div class="callout-content" style="padding: 8px 12px;">
-                        <strong><a href="${log.url}">📄 ${log.category} Log (${log.title})</a></strong> — 📅 ${formattedDate}${formattedTime}${entryHours}
+                        <strong><a href="${log.url}">📄 ${log.category} Log</a></strong> — 📅 ${formattedDate}${formattedTime}${entryHours}
                     </div>
                 </div>`;
             });
