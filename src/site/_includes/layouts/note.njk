@@ -100,8 +100,12 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         let currentBuildName = document.querySelector("h1")?.innerText?.trim() || "";
         if (!currentBuildName) {
             container.innerHTML = `
-                <div class="callout" data-callout="success">
-                    <div class="callout-title"><div class="callout-title-inner">Checklists</div></div>
+                <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
+                    <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
+                        <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg></div>
+                        <div class="callout-title-inner">Checklists</div>
+                        <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                    </div>
                     <div class="callout-content"><p><em>Could not determine build name.</em></p></div>
                 </div>`;
             return;
@@ -123,25 +127,25 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 return urlStr.includes(targetFolder) && urlStr.includes("checklist");
             });
 
+            let html = `
+            <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
+                <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
+                    <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg></div>
+                    <div class="callout-title-inner">Checklists</div>
+                    <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                </div>
+                <div class="callout-content">`;
+
             if (checklists.length === 0) {
-                container.innerHTML = `
-                    <div class="callout" data-callout="success">
-                        <div class="callout-title"><div class="callout-title-inner">Checklists</div></div>
-                        <div class="callout-content"><p><em>No checklists created for this build yet.</em></p></div>
-                    </div>`;
+                html += `<p><em>No checklists created for this build yet.</em></p></div></div>`;
+                container.innerHTML = html;
                 return;
             }
 
             let activeLists = checklists.filter(p => !p.frontmatter?.status || p.frontmatter.status.toLowerCase() !== 'completed');
             let completedLists = checklists.filter(p => p.frontmatter?.status && p.frontmatter.status.toLowerCase() === 'completed');
 
-            let html = `
-            <div class="callout" data-callout="success">
-                <div class="callout-title">
-                    <div class="callout-title-inner">Checklists</div>
-                </div>
-                <div class="callout-content">
-                    <p><strong>🔥 Active Checklists (${activeLists.length})</strong></p>`;
+            html += `<p><strong>🔥 Active Checklists (${activeLists.length})</strong></p>`;
             
             if (activeLists.length > 0) {
                 activeLists.forEach(item => {
@@ -169,7 +173,7 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
                 completedLists.forEach(item => {
                     let rawTitle = item.title || item.fileSlug || "Checklist";
                     let match = rawTitle.match(/^[^-]+-\s*(.*?)\s*Checklist$/i);
-                    let projectName = match ? match[1] : rawTitle;
+       v            let projectName = match ? match[1] : rawTitle;
                     let progress = item.frontmatter?.progress || '100.0%';
                     let url = item.url || item.permalink || `#`;
                     
@@ -190,8 +194,12 @@ permalink: "notes/{{ page.fileSlug | slugify }}/"
         } catch (err) {
             console.error("Checklist loader error:", err);
             container.innerHTML = `
-                <div class="callout" data-callout="success">
-                    <div class="callout-title"><div class="callout-title-inner">Checklists</div></div>
+                <div class="callout is-collapsed" data-callout="success" data-callout-fold="-">
+                    <div class="callout-title" onclick="let p = this.parentElement; p.classList.toggle('is-collapsed');">
+                        <div class="callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg></div>
+                        <div class="callout-title-inner">Checklists</div>
+                        <div class="callout-fold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></div>
+                    </div>
                     <div class="callout-content"><p><em>Unable to load checklists.</em></p></div>
                 </div>`;
         }
