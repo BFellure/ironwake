@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T21:00:00.559-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":["Pasted Images/Pasted Image 1790816399824-lpl6o.png"],"structures":["Church.1.mcstructure"],"tags":["builds"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T21:12:39.486-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":["Pasted Images/Pasted Image 1790816399824-lpl6o.png"],"structures":["Church.1.mcstructure"],"tags":["builds"]}}
 ---
 
 ***
@@ -30,6 +30,14 @@
 ---
 ## <div style="text-align: center;">Overview</div>
 
+
+
+67676
+
+---
+
+
+
 ---
 ## <div style="text-align: center;">Purpose</div>
 
@@ -58,7 +66,7 @@
 > [!example]- Linked Structure Files
 > <a href="https://github.com/BFellure/ironwake/releases/download/structures/Church.1.mcstructure" download>📥 Church.1.mcstructure</a>
 
-> Last Updated: 09-30-2026 09:00 PM
+> Last Updated: 09-30-2026 09:12 PM
 ---
 <div class="obsidian-only-toolbox">
 
