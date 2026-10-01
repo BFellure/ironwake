@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T20:58:50.328-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":["Pasted Images/1790816330284-Screenshot 2026-04-04 222621.png"],"structures":["Church.1.mcstructure"],"tags":["builds"]}}
+{"dg-publish":true,"permalink":"/minecraft/builds/test/","tags":["builds"],"updated":"2026-09-30T21:00:00.559-04:00","dg-note-properties":{"dimension":"Overworld","region":[["Test"]],"x_coordinate":1,"y_coordinate":1,"z_coordinate":1,"start_date":"Planning","finish_date":"In Progress","building_type":"Test","builders":[["Test"]],"images":["Pasted Images/Pasted Image 1790816399824-lpl6o.png"],"structures":["Church.1.mcstructure"],"tags":["builds"]}}
 ---
 
 ***
@@ -13,7 +13,7 @@
 ---
 
 > [!tip]+ Image
-> ![1790816330284-Screenshot 2026-04-04 222621.png\|400](/img/user/Pasted%20Images/1790816330284-Screenshot%202026-04-04%20222621.png)
+> ![Pasted Image 1790816399824-lpl6o.png\|400](/img/user/Pasted%20Images/Pasted%20Image%201790816399824-lpl6o.png)
 
 ---
 
@@ -58,7 +58,7 @@
 > [!example]- Linked Structure Files
 > <a href="https://github.com/BFellure/ironwake/releases/download/structures/Church.1.mcstructure" download>📥 Church.1.mcstructure</a>
 
-> Last Updated: 09-30-2026 08:58 PM
+> Last Updated: 09-30-2026 09:00 PM
 ---
 <div class="obsidian-only-toolbox">
 
