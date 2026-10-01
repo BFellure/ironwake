@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/minecraft/checklists/builds/test/test-67-checklist/","tags":["builds-checklist"],"updated":"2026-09-30T16:47:18.382-04:00","dg-note-properties":{"tags":["builds-checklist"],"created":"2026-09-30","status":"Active","progress":"83.3%","build-link":[["Test"]]}}
+{"dg-publish":true,"permalink":"/minecraft/checklists/builds/test/test-67-checklist/","tags":["builds-checklist"],"updated":"2026-09-30T20:56:24.945-04:00","dg-note-properties":{"tags":["builds-checklist"],"created":"2026-09-30","status":"Active","progress":"66.7%","build-link":[["Test"]]}}
 ---
 
 
@@ -10,7 +10,7 @@
 > [!info] Project Status
 > **Status:** Active
 >  
-> <p><span><div align="center"><b>Progress</b><br><div style="background: rgba(150,150,150,0.2); border-radius: 4px; height: 8px; width: 250px; margin: 6px auto; overflow: hidden; display: flex;"><div style="background: var(--interactive-accent); width: 83.3%; height: 100%;"></div></div>83.3%</div></span></p>
+> <p><span><div align="center"><b>Progress</b><br><div style="background: rgba(150,150,150,0.2); border-radius: 4px; height: 8px; width: 250px; margin: 6px auto; overflow: hidden; display: flex;"><div style="background: var(--interactive-accent); width: 66.7%; height: 100%;"></div></div>66.7%</div></span></p>
 
 ---
 
@@ -22,8 +22,7 @@
 ## 📋 Tasks
 - [ ] 67
     - [ ] 69
-    - [x] 444
-        <span style="opacity: 0.7; font-size: 0.85em;">Completed: 09-30-2026 04:46 PM</span>
+    - [ ] 444
     - [x] 666
         <span style="opacity: 0.7; font-size: 0.85em;">Completed: 09-30-2026 04:46 PM</span>
 - [x] 420
@@ -32,7 +31,7 @@
 ---
 
 ## 📝 Notes & Updates
-> Last Updated: 09-30-2026 04:47 PM
+> Last Updated: 09-30-2026 08:56 PM
 
 <div class="obsidian-only-toolbox" style="text-align: center;">
   <h2><u>Toolbox</u></h2>
